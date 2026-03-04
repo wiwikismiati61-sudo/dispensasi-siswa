@@ -327,20 +327,20 @@ export default function MasterData() {
       )}
 
       <div className="bg-white shadow sm:rounded-md flex-1 flex flex-col min-h-0">
-        <div className="overflow-x-auto overflow-y-auto flex-1">
+        <div className="overflow-x-auto flex-1">
           <table className="min-w-full divide-y divide-slate-200">
             <thead className="bg-slate-50 sticky top-0 z-10">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider whitespace-nowrap">
                   {activeTab === 'jenis_dispensasi' ? 'Nama Dispensasi' : 'Nama'}
                 </th>
                 {activeTab === 'siswa' && (
-                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Kelas</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider whitespace-nowrap">Kelas</th>
                 )}
                 {activeTab === 'jenis_dispensasi' && (
-                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Kategori</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider whitespace-nowrap">Kategori</th>
                 )}
-                <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Aksi</th>
+                <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider whitespace-nowrap">Aksi</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-slate-200">
