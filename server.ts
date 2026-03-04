@@ -1,8 +1,10 @@
 import express from 'express';
 import { createServer as createViteServer } from 'vite';
-import { sql } from '@vercel/postgres';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import fs from 'fs';
+import multer from 'multer';
+import { db } from './db.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -12,114 +14,28 @@ const PORT = 3000;
 
 app.use(express.json({ limit: '50mb' }));
 
-// Initialize DB schema
-async function initDB() {
-  if (!process.env.POSTGRES_URL) {
-    console.warn('⚠️ POSTGRES_URL environment variable is not set. Database will not work until configured.');
-    return;
-  }
-
-  try {
-    await sql`
-      CREATE TABLE IF NOT EXISTS users (
-        id SERIAL PRIMARY KEY,
-        username VARCHAR(255) UNIQUE,
-        password VARCHAR(255)
-      );
-    `;
-    await sql`
-      INSERT INTO users (username, password) VALUES ('admin', 'admin123') ON CONFLICT (username) DO NOTHING;
-    `;
-
-    await sql`
-      CREATE TABLE IF NOT EXISTS students (
-        id SERIAL PRIMARY KEY,
-        nis VARCHAR(255) UNIQUE,
-        name VARCHAR(255),
-        class_name VARCHAR(255)
-      );
-    `;
-
-    await sql`
-      CREATE TABLE IF NOT EXISTS dispensations (
-        id SERIAL PRIMARY KEY,
-        date VARCHAR(255),
-        time VARCHAR(255),
-        student_id INTEGER REFERENCES students(id),
-        type VARCHAR(255),
-        reason TEXT,
-        homeroom_teacher VARCHAR(255),
-        bk_teacher VARCHAR(255),
-        follow_up TEXT
-      );
-    `;
-
-    await sql`
-      CREATE TABLE IF NOT EXISTS homeroom_teachers (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(255) UNIQUE
-      );
-    `;
-
-    await sql`
-      CREATE TABLE IF NOT EXISTS bk_teachers (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(255) UNIQUE
-      );
-    `;
-
-    await sql`
-      CREATE TABLE IF NOT EXISTS dispensation_types (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(255) UNIQUE,
-        category VARCHAR(255)
-      );
-    `;
-
-    await sql`
-      INSERT INTO dispensation_types (name, category) VALUES 
-        ('Ada anggota keluarga sakit/meninggal', 'Dispensasi Keluarga'),
-        ('Ada acara keluarga', 'Dispensasi Keluarga'),
-        ('Lomba Akademik/ non Akademik', 'Dispensasi Kegiatan Sekolah'),
-        ('Ekstrakurikuler', 'Dispensasi Kegiatan Sekolah'),
-        ('Kegiatan Keagamaan', 'Dispensasi Kegiatan Sekolah'),
-        ('Siswa mewakili sekolah dalam kegiatan yang di undang oleh Dinas Pendidikan', 'Dispensasi Kegiatan Dinas/Undangan resmi'),
-        ('Kementerian Agama', 'Dispensasi Kegiatan Dinas/Undangan resmi'),
-        ('Instansi Pemerintah Lainnya', 'Dispensasi Kegiatan Dinas/Undangan resmi'),
-        ('Siswa Atlet yang latihan intensif', 'Dispensasi Khusus /Kondisional'),
-        ('siswa mengikuti audisi /kompetisi di luar sekolah', 'Dispensasi Khusus /Kondisional'),
-        ('kondisi sosial tertentu', 'Dispensasi Khusus /Kondisional')
-      ON CONFLICT (name) DO NOTHING;
-    `;
-    console.log('Database initialized successfully');
-  } catch (error) {
-    console.error('Failed to initialize database:', error);
-  }
-}
-
-// Call initDB on startup
-initDB();
-
 // API Routes
-app.post('/api/login', async (req, res) => {
+app.post('/api/login', (req, res) => {
   const { username, password } = req.body;
   try {
-    const { rows } = await sql`SELECT * FROM users WHERE username = ${username} AND password = ${password}`;
-    if (rows.length > 0) {
-      res.json({ success: true, user: { id: rows[0].id, username: rows[0].username } });
+    const user = db.data.users.find((u: any) => u.username === username && u.password === password);
+    if (user) {
+      res.json({ success: true, user: { id: user.id, username: user.username } });
     } else {
-      res.status(401).json({ success: false, message: 'Invalid credentials' });
+      res.status(401).json({ success: false, message: 'Username atau password salah' });
     }
   } catch (error: any) {
     res.status(500).json({ success: false, message: error.message });
   }
 });
 
-app.post('/api/change-password', async (req, res) => {
+app.post('/api/change-password', (req, res) => {
   const { username, oldPassword, newPassword } = req.body;
   try {
-    const { rowCount } = await sql`UPDATE users SET password = ${newPassword} WHERE username = ${username} AND password = ${oldPassword}`;
-    if (rowCount > 0) {
+    const userIndex = db.data.users.findIndex((u: any) => u.username === username && u.password === oldPassword);
+    if (userIndex !== -1) {
+      db.data.users[userIndex].password = newPassword;
+      db.save();
       res.json({ success: true });
     } else {
       res.status(400).json({ success: false, message: 'Invalid old password or username' });
@@ -130,26 +46,30 @@ app.post('/api/change-password', async (req, res) => {
 });
 
 // Students
-app.get('/api/students', async (req, res) => {
+app.get('/api/students', (req, res) => {
   try {
-    const { rows } = await sql`SELECT * FROM students`;
-    res.json(rows);
+    res.json(db.data.students);
   } catch (error: any) {
     res.status(500).json({ success: false, message: error.message });
   }
 });
 
-app.post('/api/students', async (req, res) => {
+app.post('/api/students', (req, res) => {
   const { nis, name, class_name } = req.body;
   try {
-    const { rows } = await sql`INSERT INTO students (nis, name, class_name) VALUES (${nis}, ${name}, ${class_name}) RETURNING id`;
-    res.json({ success: true, id: rows[0].id });
+    if (db.data.students.some((s: any) => s.nis === nis)) {
+      return res.status(400).json({ success: false, message: 'NIS already exists' });
+    }
+    const id = db.data.students.length > 0 ? Math.max(...db.data.students.map((s: any) => s.id)) + 1 : 1;
+    db.data.students.push({ id, nis, name, class_name });
+    db.save();
+    res.json({ success: true, id });
   } catch (error: any) {
     res.status(400).json({ success: false, message: error.message });
   }
 });
 
-app.post('/api/students/import', async (req, res) => {
+app.post('/api/students/import', (req, res) => {
   const { students } = req.body;
   if (!students || !Array.isArray(students)) {
     return res.status(400).json({ success: false, message: 'Invalid data' });
@@ -157,21 +77,26 @@ app.post('/api/students/import', async (req, res) => {
   
   try {
     for (const student of students) {
-      await sql`
-        INSERT INTO students (nis, name, class_name) 
-        VALUES (${student.nis}, ${student.name}, ${student.class_name})
-        ON CONFLICT (nis) DO UPDATE SET name = EXCLUDED.name, class_name = EXCLUDED.class_name
-      `;
+      const existingIndex = db.data.students.findIndex((s: any) => s.nis === student.nis);
+      if (existingIndex !== -1) {
+        db.data.students[existingIndex] = { ...db.data.students[existingIndex], ...student };
+      } else {
+        const id = db.data.students.length > 0 ? Math.max(...db.data.students.map((s: any) => s.id)) + 1 : 1;
+        db.data.students.push({ id, ...student });
+      }
     }
+    db.save();
     res.json({ success: true });
   } catch (error: any) {
     res.status(400).json({ success: false, message: error.message });
   }
 });
 
-app.delete('/api/students/:id', async (req, res) => {
+app.delete('/api/students/:id', (req, res) => {
   try {
-    await sql`DELETE FROM students WHERE id = ${req.params.id}`;
+    const id = parseInt(req.params.id);
+    db.data.students = db.data.students.filter((s: any) => s.id !== id);
+    db.save();
     res.json({ success: true });
   } catch (error: any) {
     res.status(500).json({ success: false, message: error.message });
@@ -179,42 +104,54 @@ app.delete('/api/students/:id', async (req, res) => {
 });
 
 // Homeroom Teachers
-app.get('/api/homeroom-teachers', async (req, res) => {
+app.get('/api/homeroom-teachers', (req, res) => {
   try {
-    const { rows } = await sql`SELECT * FROM homeroom_teachers`;
-    res.json(rows);
+    res.json(db.data.homeroom_teachers);
   } catch (error: any) {
     res.status(500).json({ success: false, message: error.message });
   }
 });
 
-app.post('/api/homeroom-teachers', async (req, res) => {
+app.post('/api/homeroom-teachers', (req, res) => {
   const { name } = req.body;
   try {
-    const { rows } = await sql`INSERT INTO homeroom_teachers (name) VALUES (${name}) RETURNING id`;
-    res.json({ success: true, id: rows[0].id });
+    if (db.data.homeroom_teachers.some((t: any) => t.name === name)) {
+      return res.status(400).json({ success: false, message: 'Name already exists' });
+    }
+    const id = db.data.homeroom_teachers.length > 0 ? Math.max(...db.data.homeroom_teachers.map((t: any) => t.id)) + 1 : 1;
+    db.data.homeroom_teachers.push({ id, name });
+    db.save();
+    res.json({ success: true, id });
   } catch (error: any) {
     res.status(400).json({ success: false, message: error.message });
   }
 });
 
-app.post('/api/homeroom-teachers/import', async (req, res) => {
+app.post('/api/homeroom-teachers/import', (req, res) => {
   const { teachers } = req.body;
-  if (!teachers || !Array.isArray(teachers)) return res.status(400).json({ success: false, message: 'Invalid data' });
+  if (!teachers || !Array.isArray(teachers)) {
+    return res.status(400).json({ success: false, message: 'Invalid data' });
+  }
   
   try {
     for (const teacher of teachers) {
-      await sql`INSERT INTO homeroom_teachers (name) VALUES (${teacher.name}) ON CONFLICT (name) DO NOTHING`;
+      if (!db.data.homeroom_teachers.some((t: any) => t.name === teacher.name)) {
+        const id = db.data.homeroom_teachers.length > 0 ? Math.max(...db.data.homeroom_teachers.map((t: any) => t.id)) + 1 : 1;
+        db.data.homeroom_teachers.push({ id, name: teacher.name });
+      }
     }
+    db.save();
     res.json({ success: true });
   } catch (error: any) {
     res.status(400).json({ success: false, message: error.message });
   }
 });
 
-app.delete('/api/homeroom-teachers/:id', async (req, res) => {
+app.delete('/api/homeroom-teachers/:id', (req, res) => {
   try {
-    await sql`DELETE FROM homeroom_teachers WHERE id = ${req.params.id}`;
+    const id = parseInt(req.params.id);
+    db.data.homeroom_teachers = db.data.homeroom_teachers.filter((t: any) => t.id !== id);
+    db.save();
     res.json({ success: true });
   } catch (error: any) {
     res.status(500).json({ success: false, message: error.message });
@@ -222,42 +159,54 @@ app.delete('/api/homeroom-teachers/:id', async (req, res) => {
 });
 
 // BK Teachers
-app.get('/api/bk-teachers', async (req, res) => {
+app.get('/api/bk-teachers', (req, res) => {
   try {
-    const { rows } = await sql`SELECT * FROM bk_teachers`;
-    res.json(rows);
+    res.json(db.data.bk_teachers);
   } catch (error: any) {
     res.status(500).json({ success: false, message: error.message });
   }
 });
 
-app.post('/api/bk-teachers', async (req, res) => {
+app.post('/api/bk-teachers', (req, res) => {
   const { name } = req.body;
   try {
-    const { rows } = await sql`INSERT INTO bk_teachers (name) VALUES (${name}) RETURNING id`;
-    res.json({ success: true, id: rows[0].id });
+    if (db.data.bk_teachers.some((t: any) => t.name === name)) {
+      return res.status(400).json({ success: false, message: 'Name already exists' });
+    }
+    const id = db.data.bk_teachers.length > 0 ? Math.max(...db.data.bk_teachers.map((t: any) => t.id)) + 1 : 1;
+    db.data.bk_teachers.push({ id, name });
+    db.save();
+    res.json({ success: true, id });
   } catch (error: any) {
     res.status(400).json({ success: false, message: error.message });
   }
 });
 
-app.post('/api/bk-teachers/import', async (req, res) => {
+app.post('/api/bk-teachers/import', (req, res) => {
   const { teachers } = req.body;
-  if (!teachers || !Array.isArray(teachers)) return res.status(400).json({ success: false, message: 'Invalid data' });
+  if (!teachers || !Array.isArray(teachers)) {
+    return res.status(400).json({ success: false, message: 'Invalid data' });
+  }
   
   try {
     for (const teacher of teachers) {
-      await sql`INSERT INTO bk_teachers (name) VALUES (${teacher.name}) ON CONFLICT (name) DO NOTHING`;
+      if (!db.data.bk_teachers.some((t: any) => t.name === teacher.name)) {
+        const id = db.data.bk_teachers.length > 0 ? Math.max(...db.data.bk_teachers.map((t: any) => t.id)) + 1 : 1;
+        db.data.bk_teachers.push({ id, name: teacher.name });
+      }
     }
+    db.save();
     res.json({ success: true });
   } catch (error: any) {
     res.status(400).json({ success: false, message: error.message });
   }
 });
 
-app.delete('/api/bk-teachers/:id', async (req, res) => {
+app.delete('/api/bk-teachers/:id', (req, res) => {
   try {
-    await sql`DELETE FROM bk_teachers WHERE id = ${req.params.id}`;
+    const id = parseInt(req.params.id);
+    db.data.bk_teachers = db.data.bk_teachers.filter((t: any) => t.id !== id);
+    db.save();
     res.json({ success: true });
   } catch (error: any) {
     res.status(500).json({ success: false, message: error.message });
@@ -265,42 +214,54 @@ app.delete('/api/bk-teachers/:id', async (req, res) => {
 });
 
 // Dispensation Types
-app.get('/api/dispensation-types', async (req, res) => {
+app.get('/api/dispensation-types', (req, res) => {
   try {
-    const { rows } = await sql`SELECT * FROM dispensation_types`;
-    res.json(rows);
+    res.json(db.data.dispensation_types);
   } catch (error: any) {
     res.status(500).json({ success: false, message: error.message });
   }
 });
 
-app.post('/api/dispensation-types', async (req, res) => {
+app.post('/api/dispensation-types', (req, res) => {
   const { name, category } = req.body;
   try {
-    const { rows } = await sql`INSERT INTO dispensation_types (name, category) VALUES (${name}, ${category}) RETURNING id`;
-    res.json({ success: true, id: rows[0].id });
+    if (db.data.dispensation_types.some((t: any) => t.name === name)) {
+      return res.status(400).json({ success: false, message: 'Name already exists' });
+    }
+    const id = db.data.dispensation_types.length > 0 ? Math.max(...db.data.dispensation_types.map((t: any) => t.id)) + 1 : 1;
+    db.data.dispensation_types.push({ id, name, category });
+    db.save();
+    res.json({ success: true, id });
   } catch (error: any) {
     res.status(400).json({ success: false, message: error.message });
   }
 });
 
-app.post('/api/dispensation-types/import', async (req, res) => {
+app.post('/api/dispensation-types/import', (req, res) => {
   const { types } = req.body;
-  if (!types || !Array.isArray(types)) return res.status(400).json({ success: false, message: 'Invalid data' });
+  if (!types || !Array.isArray(types)) {
+    return res.status(400).json({ success: false, message: 'Invalid data' });
+  }
   
   try {
     for (const type of types) {
-      await sql`INSERT INTO dispensation_types (name, category) VALUES (${type.name}, ${type.category}) ON CONFLICT (name) DO NOTHING`;
+      if (!db.data.dispensation_types.some((t: any) => t.name === type.name)) {
+        const id = db.data.dispensation_types.length > 0 ? Math.max(...db.data.dispensation_types.map((t: any) => t.id)) + 1 : 1;
+        db.data.dispensation_types.push({ id, name: type.name, category: type.category });
+      }
     }
+    db.save();
     res.json({ success: true });
   } catch (error: any) {
     res.status(400).json({ success: false, message: error.message });
   }
 });
 
-app.delete('/api/dispensation-types/:id', async (req, res) => {
+app.delete('/api/dispensation-types/:id', (req, res) => {
   try {
-    await sql`DELETE FROM dispensation_types WHERE id = ${req.params.id}`;
+    const id = parseInt(req.params.id);
+    db.data.dispensation_types = db.data.dispensation_types.filter((t: any) => t.id !== id);
+    db.save();
     res.json({ success: true });
   } catch (error: any) {
     res.status(500).json({ success: false, message: error.message });
@@ -308,114 +269,156 @@ app.delete('/api/dispensation-types/:id', async (req, res) => {
 });
 
 // Dispensations
-app.get('/api/dispensations', async (req, res) => {
+app.get('/api/dispensations', (req, res) => {
   try {
-    const { rows } = await sql`
-      SELECT d.*, s.name as student_name, s.class_name, s.nis
-      FROM dispensations d
-      JOIN students s ON d.student_id = s.id
-      ORDER BY d.date DESC, d.time DESC
-    `;
-    res.json(rows);
+    const dispensations = db.data.dispensations.map((d: any) => {
+      const student = db.data.students.find((s: any) => s.id === d.student_id);
+      return {
+        ...d,
+        student_name: student?.name,
+        class_name: student?.class_name,
+        nis: student?.nis
+      };
+    }).sort((a: any, b: any) => {
+      if (a.date !== b.date) return b.date.localeCompare(a.date);
+      return b.time.localeCompare(a.time);
+    });
+    res.json(dispensations);
   } catch (error: any) {
     res.status(500).json({ success: false, message: error.message });
   }
 });
 
-app.post('/api/dispensations', async (req, res) => {
+app.post('/api/dispensations', (req, res) => {
   const { date, time, student_id, type, reason, homeroom_teacher, bk_teacher, follow_up } = req.body;
   try {
-    const { rows } = await sql`
-      INSERT INTO dispensations (date, time, student_id, type, reason, homeroom_teacher, bk_teacher, follow_up)
-      VALUES (${date}, ${time}, ${student_id}, ${type}, ${reason}, ${homeroom_teacher}, ${bk_teacher}, ${follow_up})
-      RETURNING id
-    `;
-    res.json({ success: true, id: rows[0].id });
+    const id = db.data.dispensations.length > 0 ? Math.max(...db.data.dispensations.map((d: any) => d.id)) + 1 : 1;
+    db.data.dispensations.push({
+      id, date, time, student_id, type, reason, homeroom_teacher, bk_teacher, follow_up
+    });
+    db.save();
+    res.json({ success: true, id });
   } catch (error: any) {
     res.status(400).json({ success: false, message: error.message });
   }
 });
 
-app.delete('/api/dispensations/:id', async (req, res) => {
+app.delete('/api/dispensations/:id', (req, res) => {
   try {
-    await sql`DELETE FROM dispensations WHERE id = ${req.params.id}`;
+    const id = parseInt(req.params.id);
+    db.data.dispensations = db.data.dispensations.filter((d: any) => d.id !== id);
+    db.save();
     res.json({ success: true });
   } catch (error: any) {
     res.status(500).json({ success: false, message: error.message });
   }
 });
 
-app.put('/api/dispensations/:id', async (req, res) => {
-  const { id } = req.params;
+app.put('/api/dispensations/:id', (req, res) => {
+  const id = parseInt(req.params.id);
   const { date, time, student_id, type, reason, homeroom_teacher, bk_teacher, follow_up } = req.body;
   try {
-    await sql`
-      UPDATE dispensations 
-      SET date = ${date}, time = ${time}, student_id = ${student_id}, type = ${type}, reason = ${reason}, homeroom_teacher = ${homeroom_teacher}, bk_teacher = ${bk_teacher}, follow_up = ${follow_up}
-      WHERE id = ${id}
-    `;
-    res.json({ success: true });
+    const index = db.data.dispensations.findIndex((d: any) => d.id === id);
+    if (index !== -1) {
+      db.data.dispensations[index] = {
+        id, date, time, student_id, type, reason, homeroom_teacher, bk_teacher, follow_up
+      };
+      db.save();
+      res.json({ success: true });
+    } else {
+      res.status(404).json({ success: false, message: 'Dispensation not found' });
+    }
   } catch (error: any) {
     res.status(400).json({ success: false, message: error.message });
   }
 });
 
 // Dashboard Stats
-app.get('/api/dashboard', async (req, res) => {
+app.get('/api/dashboard', (req, res) => {
   try {
-    const { rows: studentRows } = await sql`SELECT COUNT(*) as count FROM students`;
-    const totalStudents = parseInt(studentRows[0].count, 10);
+    const totalStudents = db.data.students.length;
+    const totalDispensations = db.data.dispensations.length;
     
-    const { rows: dispRows } = await sql`SELECT COUNT(*) as count FROM dispensations`;
-    const totalDispensations = parseInt(dispRows[0].count, 10);
+    const frequentStudentsMap: Record<number, number> = {};
+    db.data.dispensations.forEach((d: any) => {
+      frequentStudentsMap[d.student_id] = (frequentStudentsMap[d.student_id] || 0) + 1;
+    });
     
-    const { rows: frequentStudents } = await sql`
-      SELECT s.name, s.class_name, COUNT(d.id) as count
-      FROM dispensations d
-      JOIN students s ON d.student_id = s.id
-      GROUP BY s.id, s.name, s.class_name
-      ORDER BY count DESC
-      LIMIT 5
-    `;
+    const frequentStudents = Object.entries(frequentStudentsMap)
+      .map(([id, count]) => {
+        const student = db.data.students.find((s: any) => s.id === parseInt(id));
+        return { name: student?.name, class_name: student?.class_name, count };
+      })
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
     
-    const { rows: typeStats } = await sql`
-      SELECT type, COUNT(*) as count
-      FROM dispensations
-      GROUP BY type
-    `;
+    const typeStatsMap: Record<string, number> = {};
+    db.data.dispensations.forEach((d: any) => {
+      typeStatsMap[d.type] = (typeStatsMap[d.type] || 0) + 1;
+    });
+    const typeStats = Object.entries(typeStatsMap).map(([type, count]) => ({ type, count }));
 
-    const { rows: classStats } = await sql`
-      SELECT s.class_name, COUNT(d.id) as count
-      FROM dispensations d
-      JOIN students s ON d.student_id = s.id
-      GROUP BY s.class_name
-      ORDER BY s.class_name
-    `;
+    const classStatsMap: Record<string, number> = {};
+    db.data.dispensations.forEach((d: any) => {
+      const student = db.data.students.find((s: any) => s.id === d.student_id);
+      if (student) {
+        classStatsMap[student.class_name] = (classStatsMap[student.class_name] || 0) + 1;
+      }
+    });
+    const classStats = Object.entries(classStatsMap)
+      .map(([class_name, count]) => ({ class_name, count }))
+      .sort((a, b) => a.class_name.localeCompare(b.class_name));
 
-    const { rows: uniqueStudentRows } = await sql`SELECT COUNT(DISTINCT student_id) as count FROM dispensations`;
-    const uniqueStudentsWithDispensation = parseInt(uniqueStudentRows[0].count, 10);
+    const uniqueStudentsWithDispensation = Object.keys(frequentStudentsMap).length;
     const percentage = totalStudents > 0 ? ((uniqueStudentsWithDispensation / totalStudents) * 100).toFixed(2) : 0;
 
     res.json({
       totalStudents,
       totalDispensations,
-      frequentStudents: frequentStudents.map(r => ({ ...r, count: parseInt(r.count, 10) })),
-      typeStats: typeStats.map(r => ({ ...r, count: parseInt(r.count, 10) })),
-      classStats: classStats.map(r => ({ ...r, count: parseInt(r.count, 10) })),
+      frequentStudents,
+      typeStats,
+      classStats,
       percentage
     });
   } catch (error: any) {
+    console.error('Dashboard API Error:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 });
 
 // Backup & Restore
+const upload = multer({ dest: 'uploads/' });
+
 app.get('/api/backup', (req, res) => {
-  res.status(501).json({ success: false, message: 'Backup file tidak didukung di Vercel Postgres. Silakan gunakan fitur export Excel.' });
+  try {
+    const dbPath = path.join(__dirname, 'database.json');
+    if (fs.existsSync(dbPath)) {
+      res.download(dbPath, 'database.json');
+    } else {
+      res.status(404).json({ success: false, message: 'Database file not found' });
+    }
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: error.message });
+  }
 });
 
-app.post('/api/restore', (req, res) => {
-  res.status(501).json({ success: false, message: 'Restore file tidak didukung di Vercel Postgres. Silakan gunakan fitur import Excel.' });
+app.post('/api/restore', upload.single('database'), (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: 'No file uploaded' });
+    }
+
+    const dbPath = path.join(__dirname, 'database.json');
+    fs.copyFileSync(req.file.path, dbPath);
+    fs.unlinkSync(req.file.path);
+    
+    // Reload data into memory
+    db.data = JSON.parse(fs.readFileSync(dbPath, 'utf-8'));
+    
+    res.json({ success: true, message: 'Database restored successfully.' });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: error.message });
+  }
 });
 
 async function startServer() {
@@ -432,7 +435,6 @@ async function startServer() {
     });
   }
 
-  // Only start the server if we are not running in a serverless environment (like Vercel)
   if (process.env.VERCEL !== '1') {
     app.listen(PORT, '0.0.0.0', () => {
       console.log(`Server running on http://localhost:${PORT}`);

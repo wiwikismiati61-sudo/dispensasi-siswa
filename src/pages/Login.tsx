@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { api } from '../lib/api';
 
 export default function Login({ onLogin }: { onLogin: () => void }) {
@@ -13,9 +13,11 @@ export default function Login({ onLogin }: { onLogin: () => void }) {
       if (res.success) {
         localStorage.setItem('user', JSON.stringify(res.user));
         onLogin();
+      } else {
+        setError(res.message || 'Username atau password salah');
       }
     } catch (err: any) {
-      setError('Username atau password salah');
+      setError(err.message || 'Terjadi kesalahan saat login');
     }
   };
 

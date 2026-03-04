@@ -5,6 +5,7 @@ import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer, BarChart, Ba
 
 export default function Dashboard() {
   const [stats, setStats] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchStats();
@@ -14,11 +15,13 @@ export default function Dashboard() {
     try {
       const data = await api.get('/dashboard');
       setStats(data);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to fetch stats', error);
+      setError(error.message || 'Failed to fetch stats');
     }
   };
 
+  if (error) return <div className="p-4 text-red-500">Error: {error}</div>;
   if (!stats) return <div className="p-4">Loading...</div>;
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
