@@ -5,7 +5,17 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const dbPath = path.join(__dirname, 'database.json');
+const isVercel = process.env.VERCEL === '1';
+const originalDbPath = isVercel ? path.join(process.cwd(), 'database.json') : path.join(__dirname, 'database.json');
+const dbPath = isVercel ? path.join('/tmp', 'database.json') : originalDbPath;
+
+if (isVercel && !fs.existsSync(dbPath) && fs.existsSync(originalDbPath)) {
+  try {
+    fs.copyFileSync(originalDbPath, dbPath);
+  } catch (e) {
+    console.error('Failed to copy database.json to /tmp', e);
+  }
+}
 
 class JSONDatabase {
   public data: any;
