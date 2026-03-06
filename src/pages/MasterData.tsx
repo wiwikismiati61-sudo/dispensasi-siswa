@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../lib/api';
 import * as XLSX from 'xlsx';
-import { Upload, Plus, Trash2 } from 'lucide-react';
+import { Upload, Plus, Trash2, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 type TabType = 'siswa' | 'wali_kelas' | 'guru_bk' | 'jenis_dispensasi';
 
@@ -188,18 +188,18 @@ export default function MasterData() {
   };
 
   return (
-    <div className="flex flex-col h-full space-y-6">
+    <div className="flex flex-col h-full space-y-6 pb-8">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 flex-shrink-0">
-        <h1 className="text-2xl font-semibold text-slate-900">{getTitle()}</h1>
-        <div className="flex space-x-3">
-          <label className="inline-flex items-center px-4 py-2 border border-slate-300 shadow-sm text-sm font-medium rounded-md text-slate-700 bg-white hover:bg-slate-50 cursor-pointer">
-            <Upload className="-ml-1 mr-2 h-5 w-5 text-slate-500" />
+        <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">{getTitle()}</h1>
+        <div className="flex space-x-3 w-full sm:w-auto">
+          <label className="flex-1 sm:flex-none inline-flex justify-center items-center px-4 py-2.5 border border-slate-200 shadow-sm text-sm font-bold rounded-xl text-slate-700 bg-white hover:bg-slate-50 hover:border-slate-300 cursor-pointer transition-all duration-200">
+            <Upload className="-ml-1 mr-2 h-5 w-5 text-indigo-500" />
             Import Excel
             <input type="file" className="hidden" accept=".xlsx, .xls" onChange={handleFileUpload} />
           </label>
           <button
             onClick={() => setShowAddForm(!showAddForm)}
-            className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+            className="flex-1 sm:flex-none inline-flex justify-center items-center px-4 py-2.5 border border-transparent shadow-md text-sm font-bold rounded-xl text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
           >
             <Plus className="-ml-1 mr-2 h-5 w-5" />
             Tambah Manual
@@ -208,8 +208,8 @@ export default function MasterData() {
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-slate-200 flex-shrink-0">
-        <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-1.5 flex-shrink-0 overflow-x-auto">
+        <nav className="flex space-x-1 min-w-max" aria-label="Tabs">
           {[
             { id: 'siswa', label: 'Siswa' },
             { id: 'wali_kelas', label: 'Wali Kelas' },
@@ -223,10 +223,10 @@ export default function MasterData() {
                 setShowAddForm(false);
               }}
               className={`
-                whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm
+                whitespace-nowrap py-2.5 px-6 rounded-xl font-bold text-sm transition-all duration-200
                 ${activeTab === tab.id
-                  ? 'border-indigo-500 text-indigo-600'
-                  : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300'
+                  ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-md'
+                  : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
                 }
               `}
             >
@@ -237,28 +237,34 @@ export default function MasterData() {
       </div>
 
       {showAddForm && (
-        <div className="bg-white shadow sm:rounded-lg p-6 flex-shrink-0">
-          <form onSubmit={handleAdd} className="grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-4">
+        <div className="bg-white shadow-lg rounded-2xl p-6 border border-slate-100 flex-shrink-0 animate-in fade-in slide-in-from-top-4 duration-300">
+          <div className="mb-6 pb-4 border-b border-slate-100">
+            <h3 className="text-lg font-bold text-slate-800">Form Tambah Data</h3>
+            <p className="text-sm text-slate-500 mt-1">Silakan isi form di bawah ini untuk menambahkan data baru.</p>
+          </div>
+          <form onSubmit={handleAdd} className="grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-6">
             {activeTab === 'siswa' && (
               <>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700">Nama Siswa</label>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">Nama Siswa</label>
                   <input
                     type="text"
                     required
                     value={studentForm.name}
                     onChange={(e) => setStudentForm({ ...studentForm, name: e.target.value })}
-                    className="mt-1 block w-full border border-slate-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    className="block w-full border border-slate-200 rounded-xl shadow-sm py-2.5 px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all sm:text-sm bg-slate-50 focus:bg-white"
+                    placeholder="Masukkan nama siswa"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700">Kelas</label>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">Kelas</label>
                   <input
                     type="text"
                     required
                     value={studentForm.class_name}
                     onChange={(e) => setStudentForm({ ...studentForm, class_name: e.target.value })}
-                    className="mt-1 block w-full border border-slate-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    className="block w-full border border-slate-200 rounded-xl shadow-sm py-2.5 px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all sm:text-sm bg-slate-50 focus:bg-white"
+                    placeholder="Contoh: X RPL 1"
                   />
                 </div>
               </>
@@ -266,13 +272,14 @@ export default function MasterData() {
 
             {(activeTab === 'wali_kelas' || activeTab === 'guru_bk') && (
               <div className="sm:col-span-2">
-                <label className="block text-sm font-medium text-slate-700">Nama Guru</label>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">Nama Guru</label>
                 <input
                   type="text"
                   required
                   value={teacherForm.name}
                   onChange={(e) => setTeacherForm({ ...teacherForm, name: e.target.value })}
-                  className="mt-1 block w-full border border-slate-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                  className="block w-full border border-slate-200 rounded-xl shadow-sm py-2.5 px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all sm:text-sm bg-slate-50 focus:bg-white"
+                  placeholder="Masukkan nama guru beserta gelar"
                 />
               </div>
             )}
@@ -280,22 +287,23 @@ export default function MasterData() {
             {activeTab === 'jenis_dispensasi' && (
               <>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700">Nama Dispensasi</label>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">Nama Dispensasi</label>
                   <input
                     type="text"
                     required
                     value={dispensationForm.name}
                     onChange={(e) => setDispensationForm({ ...dispensationForm, name: e.target.value })}
-                    className="mt-1 block w-full border border-slate-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    className="block w-full border border-slate-200 rounded-xl shadow-sm py-2.5 px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all sm:text-sm bg-slate-50 focus:bg-white"
+                    placeholder="Masukkan nama/alasan dispensasi"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700">Kategori</label>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">Kategori</label>
                   <select
                     required
                     value={dispensationForm.category}
                     onChange={(e) => setDispensationForm({ ...dispensationForm, category: e.target.value })}
-                    className="mt-1 block w-full border border-slate-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    className="block w-full border border-slate-200 rounded-xl shadow-sm py-2.5 px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all sm:text-sm bg-slate-50 focus:bg-white"
                   >
                     <option value="">Pilih Kategori...</option>
                     <option value="Dispensasi Keluarga">Dispensasi Keluarga</option>
@@ -307,67 +315,87 @@ export default function MasterData() {
               </>
             )}
 
-            <div className="sm:col-span-2 flex justify-end">
+            <div className="sm:col-span-2 flex justify-end pt-4 border-t border-slate-100 mt-2">
               <button
                 type="button"
                 onClick={() => setShowAddForm(false)}
-                className="mr-3 bg-white py-2 px-4 border border-slate-300 rounded-md shadow-sm text-sm font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="mr-3 bg-white py-2.5 px-6 border border-slate-200 rounded-xl shadow-sm text-sm font-bold text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 transition-all"
               >
                 Batal
               </button>
               <button
                 type="submit"
-                className="bg-indigo-600 border border-transparent rounded-md shadow-sm py-2 px-4 inline-flex justify-center text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="bg-gradient-to-r from-indigo-600 to-purple-600 border border-transparent rounded-xl shadow-md py-2.5 px-6 inline-flex justify-center text-sm font-bold text-white hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
               >
-                Simpan
+                Simpan Data
               </button>
             </div>
           </form>
         </div>
       )}
 
-      <div className="bg-white shadow sm:rounded-md flex-1 flex flex-col min-h-0">
+      <div className="bg-white shadow-lg rounded-2xl border border-slate-100 flex-1 flex flex-col min-h-0 overflow-hidden">
         <div className="overflow-x-auto flex-1">
           <table className="min-w-full divide-y divide-slate-200">
             <thead className="bg-slate-50 sticky top-0 z-10">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider whitespace-nowrap">
+                <th className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">
                   {activeTab === 'jenis_dispensasi' ? 'Nama Dispensasi' : 'Nama'}
                 </th>
                 {activeTab === 'siswa' && (
-                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider whitespace-nowrap">Kelas</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Kelas</th>
                 )}
                 {activeTab === 'jenis_dispensasi' && (
-                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider whitespace-nowrap">Kategori</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Kategori</th>
                 )}
-                <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider whitespace-nowrap">Aksi</th>
+                <th className="px-6 py-4 text-right text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Aksi</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-slate-200">
+            <tbody className="bg-white divide-y divide-slate-100">
               {loading ? (
                 <tr>
-                  <td colSpan={3} className="px-4 py-4 text-center text-sm text-slate-500">Loading...</td>
+                  <td colSpan={4} className="px-6 py-12 text-center">
+                    <div className="flex flex-col items-center justify-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mb-4"></div>
+                      <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+                    </div>
+                  </td>
                 </tr>
               ) : data.length === 0 ? (
                 <tr>
-                  <td colSpan={3} className="px-4 py-4 text-center text-sm text-slate-500">Belum ada data</td>
+                  <td colSpan={4} className="px-6 py-12 text-center">
+                    <div className="flex flex-col items-center justify-center text-slate-400">
+                      <AlertCircle className="h-12 w-12 mb-3 text-slate-300" />
+                      <span className="text-base font-medium text-slate-500">Belum ada data</span>
+                      <span className="text-sm mt-1">Silakan tambah data manual atau import dari Excel.</span>
+                    </div>
+                  </td>
                 </tr>
               ) : (
                 data.map((item) => (
-                  <tr key={item.id}>
-                    <td className="px-4 py-3 text-sm font-medium text-slate-900">{item.name}</td>
+                  <tr key={item.id} className="hover:bg-slate-50 transition-colors">
+                    <td className="px-6 py-4 text-sm font-semibold text-slate-800">{item.name}</td>
                     {activeTab === 'siswa' && (
-                      <td className="px-4 py-3 text-sm text-slate-500">{item.class_name}</td>
+                      <td className="px-6 py-4 text-sm text-slate-600">
+                        <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100">
+                          {item.class_name}
+                        </span>
+                      </td>
                     )}
                     {activeTab === 'jenis_dispensasi' && (
-                      <td className="px-4 py-3 text-sm text-slate-500">{item.category}</td>
+                      <td className="px-6 py-4 text-sm text-slate-600">
+                        <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-50 text-purple-700 border border-purple-100">
+                          {item.category}
+                        </span>
+                      </td>
                     )}
-                    <td className="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <button
                         onClick={() => setDeleteId(item.id)}
-                        className="text-red-600 hover:text-red-900"
+                        className="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-2 rounded-lg transition-colors"
+                        title="Hapus"
                       >
-                        <Trash2 className="h-5 w-5 inline" />
+                        <Trash2 className="h-5 w-5" />
                       </button>
                     </td>
                   </tr>
@@ -380,22 +408,25 @@ export default function MasterData() {
 
       {/* Delete Confirmation Modal */}
       {deleteId && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full">
-            <h3 className="text-lg font-medium text-slate-900 mb-4">Konfirmasi Hapus</h3>
-            <p className="text-sm text-slate-500 mb-6">Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat dibatalkan.</p>
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+          <div className="bg-white p-6 rounded-2xl shadow-2xl max-w-sm w-full transform transition-all scale-100">
+            <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-4">
+              <AlertCircle className="h-6 w-6 text-red-600" />
+            </div>
+            <h3 className="text-xl font-bold text-slate-900 mb-2">Konfirmasi Hapus</h3>
+            <p className="text-sm text-slate-500 mb-6 leading-relaxed">Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat dibatalkan dan data akan hilang permanen.</p>
             <div className="flex justify-end space-x-3">
               <button
                 onClick={() => setDeleteId(null)}
-                className="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-md hover:bg-slate-50"
+                className="px-4 py-2.5 text-sm font-bold text-slate-700 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors"
               >
                 Batal
               </button>
               <button
                 onClick={handleDelete}
-                className="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700"
+                className="px-4 py-2.5 text-sm font-bold text-white bg-red-600 border border-transparent rounded-xl hover:bg-red-700 shadow-sm transition-colors"
               >
-                Hapus
+                Ya, Hapus
               </button>
             </div>
           </div>
@@ -404,14 +435,19 @@ export default function MasterData() {
 
       {/* Error Modal */}
       {errorMessage && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full">
-            <h3 className="text-lg font-medium text-red-600 mb-4">Terjadi Kesalahan</h3>
-            <p className="text-sm text-slate-500 mb-6">{errorMessage}</p>
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+          <div className="bg-white p-6 rounded-2xl shadow-2xl max-w-sm w-full border-t-4 border-red-500">
+            <div className="flex items-center mb-4">
+              <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center mr-3">
+                <AlertCircle className="h-5 w-5 text-red-600" />
+              </div>
+              <h3 className="text-lg font-bold text-slate-900">Terjadi Kesalahan</h3>
+            </div>
+            <p className="text-sm text-slate-600 mb-6">{errorMessage}</p>
             <div className="flex justify-end">
               <button
                 onClick={() => setErrorMessage(null)}
-                className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700"
+                className="px-5 py-2.5 text-sm font-bold text-white bg-slate-800 rounded-xl hover:bg-slate-900 transition-colors"
               >
                 Tutup
               </button>
@@ -422,14 +458,19 @@ export default function MasterData() {
 
       {/* Success Modal */}
       {successMessage && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full">
-            <h3 className="text-lg font-medium text-green-600 mb-4">Berhasil</h3>
-            <p className="text-sm text-slate-500 mb-6">{successMessage}</p>
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+          <div className="bg-white p-6 rounded-2xl shadow-2xl max-w-sm w-full border-t-4 border-emerald-500">
+            <div className="flex items-center mb-4">
+              <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center mr-3">
+                <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+              </div>
+              <h3 className="text-lg font-bold text-slate-900">Berhasil</h3>
+            </div>
+            <p className="text-sm text-slate-600 mb-6">{successMessage}</p>
             <div className="flex justify-end">
               <button
                 onClick={() => setSuccessMessage(null)}
-                className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700"
+                className="px-5 py-2.5 text-sm font-bold text-white bg-emerald-600 rounded-xl hover:bg-emerald-700 transition-colors shadow-sm"
               >
                 Tutup
               </button>
