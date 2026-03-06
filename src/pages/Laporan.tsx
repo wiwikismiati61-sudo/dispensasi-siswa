@@ -19,6 +19,8 @@ export default function Laporan() {
   const [classes, setClasses] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterType, setFilterType] = useState('Semua');
+  const [filterClass, setFilterClass] = useState('Semua');
+  const [filterStudent, setFilterStudent] = useState('');
   const [filterDateStart, setFilterDateStart] = useState('');
   const [filterDateEnd, setFilterDateEnd] = useState('');
   const [activeTab, setActiveTab] = useState<'data' | 'rekap' | 'rekap_siswa'>('data');
@@ -47,26 +49,40 @@ export default function Laporan() {
   const filteredData = dispensations.filter((item) => {
     let match = true;
     if (filterType !== 'Semua' && item.type !== filterType) match = false;
+    if (filterClass !== 'Semua' && item.class_name !== filterClass) match = false;
+    if (filterStudent && !item.student_name?.toLowerCase().includes(filterStudent.toLowerCase())) match = false;
     if (filterDateStart && item.date < filterDateStart) match = false;
     if (filterDateEnd && item.date > filterDateEnd) match = false;
     return match;
   });
 
-  const recapData = classes.map(className => {
-    const count = filteredData.filter(item => item.class_name === className).length;
-    return {
-      'Kelas': className,
-      'Jumlah Dispensasi': count
-    };
+  const recapKelasMap = new Map();
+  filteredData.forEach(item => {
+    const key = `${item.class_name}-${item.type}`;
+    if (!recapKelasMap.has(key)) {
+      recapKelasMap.set(key, {
+        'Kelas': item.class_name,
+        'Jenis Dispensasi': item.type,
+        'Jumlah Dispensasi': 0
+      });
+    }
+    const record = recapKelasMap.get(key);
+    record['Jumlah Dispensasi'] += 1;
+  });
+  
+  const recapData = Array.from(recapKelasMap.values()).sort((a, b) => {
+    if (a['Kelas'] !== b['Kelas']) return a['Kelas'].localeCompare(b['Kelas']);
+    return a['Jenis Dispensasi'].localeCompare(b['Jenis Dispensasi']);
   });
 
   const rekapSiswaMap = new Map();
   filteredData.forEach(item => {
-    const key = `${item.student_name}-${item.class_name}`;
+    const key = `${item.student_name}-${item.class_name}-${item.type}`;
     if (!rekapSiswaMap.has(key)) {
       rekapSiswaMap.set(key, {
         'Nama Siswa': item.student_name,
         'Kelas': item.class_name,
+        'Jenis Dispensasi': item.type,
         'Jumlah Dispensasi': 0,
         'Alasan': [] as string[]
       });
@@ -167,7 +183,7 @@ export default function Laporan() {
           <Filter className="h-5 w-5 mr-2" />
           Filter Laporan
         </div>
-        <div className="grid grid-cols-1 gap-y-6 sm:grid-cols-3 sm:gap-x-4">
+        <div className="grid grid-cols-1 gap-y-6 sm:grid-cols-5 sm:gap-x-4">
           <div>
             <label className="block text-sm font-medium text-slate-700">Jenis Dispensasi</label>
             <select
@@ -179,6 +195,29 @@ export default function Laporan() {
                 <option key={cat} value={cat}>{cat}</option>
               ))}
             </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700">Kelas</label>
+            <select
+              value={filterClass}
+              onChange={(e) => setFilterClass(e.target.value)}
+              className="mt-1 block w-full border border-slate-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            >
+              <option value="Semua">Semua Kelas</option>
+              {classes.map((c) => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-slate-700">Nama Siswa</label>
+            <input
+              type="text"
+              placeholder="Cari nama..."
+              value={filterStudent}
+              onChange={(e) => setFilterStudent(e.target.value)}
+              className="mt-1 block w-full border border-slate-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            />
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-700">Tanggal Mulai</label>
@@ -251,6 +290,7 @@ export default function Laporan() {
               <thead className="bg-slate-50 sticky top-0 z-10">
                 <tr>
                   <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider whitespace-nowrap">Kelas</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider whitespace-nowrap">Jenis Dispensasi</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider whitespace-nowrap">Jumlah Dispensasi</th>
                 </tr>
               </thead>
@@ -258,6 +298,7 @@ export default function Laporan() {
                 {recapData.map((item, idx) => (
                   <tr key={idx}>
                     <td className="px-4 py-3 text-sm font-medium text-slate-900">{item['Kelas']}</td>
+                    <td className="px-4 py-3 text-sm text-slate-500">{item['Jenis Dispensasi']}</td>
                     <td className="px-4 py-3 text-sm text-slate-500">{item['Jumlah Dispensasi']}</td>
                   </tr>
                 ))}
@@ -273,6 +314,7 @@ export default function Laporan() {
                 <tr>
                   <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider whitespace-nowrap">Nama Siswa</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider whitespace-nowrap">Kelas</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider whitespace-nowrap">Jenis Dispensasi</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider whitespace-nowrap">Jumlah Dispensasi</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider whitespace-nowrap">Alasan</th>
                 </tr>
@@ -282,13 +324,14 @@ export default function Laporan() {
                   <tr key={idx}>
                     <td className="px-4 py-3 text-sm font-medium text-slate-900">{item['Nama Siswa']}</td>
                     <td className="px-4 py-3 text-sm text-slate-500">{item['Kelas']}</td>
+                    <td className="px-4 py-3 text-sm text-slate-500">{item['Jenis Dispensasi']}</td>
                     <td className="px-4 py-3 text-sm text-slate-500">{item['Jumlah Dispensasi']}</td>
                     <td className="px-4 py-3 text-sm text-slate-500">{item['Alasan']}</td>
                   </tr>
                 ))}
                 {rekapSiswaData.length === 0 && (
                   <tr>
-                    <td colSpan={4} className="px-4 py-4 text-center text-sm text-slate-500">Tidak ada data</td>
+                    <td colSpan={5} className="px-4 py-4 text-center text-sm text-slate-500">Tidak ada data</td>
                   </tr>
                 )}
               </tbody>

@@ -272,12 +272,12 @@ app.delete('/api/dispensation-types/:id', (req, res) => {
 app.get('/api/dispensations', (req, res) => {
   try {
     const dispensations = db.data.dispensations.map((d: any) => {
-      const student = db.data.students.find((s: any) => s.id === d.student_id);
+      const student = db.data.students.find((s: any) => s.id.toString() === d.student_id?.toString());
       return {
         ...d,
-        student_name: student?.name,
-        class_name: student?.class_name,
-        nis: student?.nis
+        student_name: student?.name || 'Unknown',
+        class_name: student?.class_name || 'Unknown',
+        nis: student?.nis || '-'
       };
     }).sort((a: any, b: any) => {
       if (a.date !== b.date) return b.date.localeCompare(a.date);
@@ -339,15 +339,18 @@ app.get('/api/dashboard', (req, res) => {
     const totalStudents = db.data.students.length;
     const totalDispensations = db.data.dispensations.length;
     
-    const frequentStudentsMap: Record<number, number> = {};
+    const frequentStudentsMap: Record<string, number> = {};
     db.data.dispensations.forEach((d: any) => {
-      frequentStudentsMap[d.student_id] = (frequentStudentsMap[d.student_id] || 0) + 1;
+      const id = d.student_id?.toString();
+      if (id) {
+        frequentStudentsMap[id] = (frequentStudentsMap[id] || 0) + 1;
+      }
     });
     
     const frequentStudents = Object.entries(frequentStudentsMap)
       .map(([id, count]) => {
-        const student = db.data.students.find((s: any) => s.id === parseInt(id));
-        return { name: student?.name, class_name: student?.class_name, count };
+        const student = db.data.students.find((s: any) => s.id.toString() === id);
+        return { name: student?.name || 'Unknown', class_name: student?.class_name || 'Unknown', count };
       })
       .sort((a, b) => b.count - a.count)
       .slice(0, 5);
@@ -360,7 +363,7 @@ app.get('/api/dashboard', (req, res) => {
 
     const classStatsMap: Record<string, number> = {};
     db.data.dispensations.forEach((d: any) => {
-      const student = db.data.students.find((s: any) => s.id === d.student_id);
+      const student = db.data.students.find((s: any) => s.id.toString() === d.student_id?.toString());
       if (student) {
         classStatsMap[student.class_name] = (classStatsMap[student.class_name] || 0) + 1;
       }
