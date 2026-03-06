@@ -174,7 +174,7 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
                       <Upload className="h-5 w-5 text-emerald-600" />
                     </div>
                     <span className="text-sm font-bold text-slate-700 group-hover:text-emerald-700">Restore Data</span>
-                    <input type="file" className="hidden" accept=".sqlite" onChange={handleRestore} />
+                    <input type="file" className="hidden" accept=".json,application/json,.sqlite,*/*" onChange={handleRestore} />
                   </label>
                 </div>
                 <p className="mt-3 text-xs text-slate-500 text-center bg-slate-50 p-2 rounded-lg">
