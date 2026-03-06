@@ -3,11 +3,12 @@ export const api = {
     const res = await fetch(`/api${endpoint}`);
     if (!res.ok) {
       let message = 'Terjadi kesalahan';
+      const text = await res.text();
       try {
-        const err = await res.json();
+        const err = JSON.parse(text);
         message = err.message || message;
       } catch (e) {
-        message = await res.text();
+        message = text || message;
       }
       throw new Error(message);
     }
@@ -21,11 +22,12 @@ export const api = {
     });
     if (!res.ok) {
       let message = 'Terjadi kesalahan';
+      const text = await res.text();
       try {
-        const err = await res.json();
+        const err = JSON.parse(text);
         message = err.message || message;
       } catch (e) {
-        message = await res.text();
+        message = text || message;
       }
       throw new Error(message);
     }
@@ -37,11 +39,12 @@ export const api = {
     });
     if (!res.ok) {
       let message = 'Terjadi kesalahan';
+      const text = await res.text();
       try {
-        const err = await res.json();
+        const err = JSON.parse(text);
         message = err.message || message;
       } catch (e) {
-        message = await res.text();
+        message = text || message;
       }
       throw new Error(message);
     }
@@ -55,11 +58,12 @@ export const api = {
     });
     if (!res.ok) {
       let message = 'Terjadi kesalahan';
+      const text = await res.text();
       try {
-        const err = await res.json();
+        const err = JSON.parse(text);
         message = err.message || message;
       } catch (e) {
-        message = await res.text();
+        message = text || message;
       }
       throw new Error(message);
     }

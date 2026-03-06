@@ -7,7 +7,7 @@ const __dirname = path.dirname(__filename);
 
 const isVercel = process.env.VERCEL === '1';
 const originalDbPath = isVercel ? path.join(process.cwd(), 'database.json') : path.join(__dirname, 'database.json');
-const dbPath = isVercel ? path.join('/tmp', 'database.json') : originalDbPath;
+export const dbPath = isVercel ? path.join('/tmp', 'database.json') : originalDbPath;
 
 if (isVercel && !fs.existsSync(dbPath) && fs.existsSync(originalDbPath)) {
   try {

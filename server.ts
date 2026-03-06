@@ -3,7 +3,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
 import multer from 'multer';
-import { db } from './db.js';
+import { db, dbPath } from './db.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -389,11 +389,10 @@ app.get('/api/dashboard', (req, res) => {
 });
 
 // Backup & Restore
-const upload = multer({ dest: 'uploads/' });
+const upload = multer({ dest: process.env.VERCEL === '1' ? '/tmp' : 'uploads/' });
 
 app.get('/api/backup', (req, res) => {
   try {
-    const dbPath = path.join(__dirname, 'database.json');
     if (fs.existsSync(dbPath)) {
       res.download(dbPath, 'database.json');
     } else {
@@ -410,7 +409,6 @@ app.post('/api/restore', upload.single('database'), (req, res) => {
       return res.status(400).json({ success: false, message: 'No file uploaded' });
     }
 
-    const dbPath = path.join(__dirname, 'database.json');
     fs.copyFileSync(req.file.path, dbPath);
     fs.unlinkSync(req.file.path);
     
@@ -438,13 +436,13 @@ async function startServer() {
     });
   }
 
-  if (process.env.VERCEL !== '1') {
-    app.listen(PORT, '0.0.0.0', () => {
-      console.log(`Server running on http://localhost:${PORT}`);
-    });
-  }
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
 }
 
-startServer();
+if (process.env.VERCEL !== '1') {
+  startServer();
+}
 
 export default app;
