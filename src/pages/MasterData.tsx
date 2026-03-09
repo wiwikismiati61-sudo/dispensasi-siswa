@@ -188,27 +188,29 @@ export default function MasterData() {
   };
 
   return (
-    <div className="flex flex-col h-full space-y-6 pb-8">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 flex-shrink-0">
-        <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">{getTitle()}</h1>
-        <div className="flex space-x-3 w-full sm:w-auto">
-          <label className="flex-1 sm:flex-none inline-flex justify-center items-center px-4 py-2.5 border border-slate-200 shadow-sm text-sm font-bold rounded-xl text-slate-700 bg-white hover:bg-slate-50 hover:border-slate-300 cursor-pointer transition-all duration-200">
-            <Upload className="-ml-1 mr-2 h-5 w-5 text-indigo-500" />
-            Import Excel
+    <div className="flex flex-col h-full space-y-4 sm:space-y-6 pb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 flex-shrink-0">
+        <h1 className="text-lg sm:text-xl md:text-2xl font-extrabold text-slate-800 tracking-tight">{getTitle()}</h1>
+        <div className="flex space-x-2 sm:space-x-3 w-full sm:w-auto">
+          <label className="flex-1 sm:flex-none inline-flex justify-center items-center px-2.5 py-1.5 sm:px-3 sm:py-2 border border-slate-200 shadow-sm text-xs font-bold rounded-lg text-slate-700 bg-white hover:bg-slate-50 hover:border-slate-300 cursor-pointer transition-all duration-200">
+            <Upload className="-ml-1 mr-1.5 h-4 w-4 text-indigo-500" />
+            <span className="hidden sm:inline">Import Excel</span>
+            <span className="sm:hidden">Import</span>
             <input type="file" className="hidden" accept=".xlsx, .xls" onChange={handleFileUpload} />
           </label>
           <button
             onClick={() => setShowAddForm(!showAddForm)}
-            className="flex-1 sm:flex-none inline-flex justify-center items-center px-4 py-2.5 border border-transparent shadow-md text-sm font-bold rounded-xl text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+            className="flex-1 sm:flex-none inline-flex justify-center items-center px-2.5 py-1.5 sm:px-3 sm:py-2 border border-transparent shadow-md text-xs font-bold rounded-lg text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
           >
-            <Plus className="-ml-1 mr-2 h-5 w-5" />
-            Tambah Manual
+            <Plus className="-ml-1 mr-1.5 h-4 w-4" />
+            <span className="hidden sm:inline">Tambah Manual</span>
+            <span className="sm:hidden">Tambah</span>
           </button>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-1.5 flex-shrink-0 overflow-x-auto">
+      <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-1 flex-shrink-0 overflow-x-auto">
         <nav className="flex space-x-1 min-w-max" aria-label="Tabs">
           {[
             { id: 'siswa', label: 'Siswa' },
@@ -223,7 +225,7 @@ export default function MasterData() {
                 setShowAddForm(false);
               }}
               className={`
-                whitespace-nowrap py-2.5 px-6 rounded-xl font-bold text-sm transition-all duration-200
+                whitespace-nowrap py-1.5 px-3 sm:py-2 sm:px-4 rounded-lg font-bold text-xs transition-all duration-200
                 ${activeTab === tab.id
                   ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-md'
                   : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
@@ -237,33 +239,33 @@ export default function MasterData() {
       </div>
 
       {showAddForm && (
-        <div className="bg-white shadow-lg rounded-2xl p-6 border border-slate-100 flex-shrink-0 animate-in fade-in slide-in-from-top-4 duration-300">
-          <div className="mb-6 pb-4 border-b border-slate-100">
-            <h3 className="text-lg font-bold text-slate-800">Form Tambah Data</h3>
-            <p className="text-sm text-slate-500 mt-1">Silakan isi form di bawah ini untuk menambahkan data baru.</p>
+        <div className="bg-white shadow-lg rounded-xl p-3 sm:p-4 border border-slate-100 flex-shrink-0 animate-in fade-in slide-in-from-top-4 duration-300">
+          <div className="mb-3 sm:mb-4 pb-2 sm:pb-3 border-b border-slate-100">
+            <h3 className="text-sm sm:text-base font-bold text-slate-800">Form Tambah Data</h3>
+            <p className="text-[10px] sm:text-xs text-slate-500 mt-1">Silakan isi form di bawah ini untuk menambahkan data baru.</p>
           </div>
-          <form onSubmit={handleAdd} className="grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-6">
+          <form onSubmit={handleAdd} className="grid grid-cols-1 gap-y-4 sm:gap-y-6 sm:grid-cols-2 sm:gap-x-6">
             {activeTab === 'siswa' && (
               <>
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">Nama Siswa</label>
+                  <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5 sm:mb-2">Nama Siswa</label>
                   <input
                     type="text"
                     required
                     value={studentForm.name}
                     onChange={(e) => setStudentForm({ ...studentForm, name: e.target.value })}
-                    className="block w-full border border-slate-200 rounded-xl shadow-sm py-2.5 px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all sm:text-sm bg-slate-50 focus:bg-white"
+                    className="block w-full border border-slate-200 rounded-xl shadow-sm py-2 sm:py-2.5 px-3 sm:px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-xs sm:text-sm bg-slate-50 focus:bg-white"
                     placeholder="Masukkan nama siswa"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">Kelas</label>
+                  <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5 sm:mb-2">Kelas</label>
                   <input
                     type="text"
                     required
                     value={studentForm.class_name}
                     onChange={(e) => setStudentForm({ ...studentForm, class_name: e.target.value })}
-                    className="block w-full border border-slate-200 rounded-xl shadow-sm py-2.5 px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all sm:text-sm bg-slate-50 focus:bg-white"
+                    className="block w-full border border-slate-200 rounded-xl shadow-sm py-2 sm:py-2.5 px-3 sm:px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-xs sm:text-sm bg-slate-50 focus:bg-white"
                     placeholder="Contoh: X RPL 1"
                   />
                 </div>
@@ -272,13 +274,13 @@ export default function MasterData() {
 
             {(activeTab === 'wali_kelas' || activeTab === 'guru_bk') && (
               <div className="sm:col-span-2">
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Nama Guru</label>
+                <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5 sm:mb-2">Nama Guru</label>
                 <input
                   type="text"
                   required
                   value={teacherForm.name}
                   onChange={(e) => setTeacherForm({ ...teacherForm, name: e.target.value })}
-                  className="block w-full border border-slate-200 rounded-xl shadow-sm py-2.5 px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all sm:text-sm bg-slate-50 focus:bg-white"
+                  className="block w-full border border-slate-200 rounded-xl shadow-sm py-2 sm:py-2.5 px-3 sm:px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-xs sm:text-sm bg-slate-50 focus:bg-white"
                   placeholder="Masukkan nama guru beserta gelar"
                 />
               </div>
@@ -287,23 +289,23 @@ export default function MasterData() {
             {activeTab === 'jenis_dispensasi' && (
               <>
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">Nama Dispensasi</label>
+                  <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5 sm:mb-2">Nama Dispensasi</label>
                   <input
                     type="text"
                     required
                     value={dispensationForm.name}
                     onChange={(e) => setDispensationForm({ ...dispensationForm, name: e.target.value })}
-                    className="block w-full border border-slate-200 rounded-xl shadow-sm py-2.5 px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all sm:text-sm bg-slate-50 focus:bg-white"
+                    className="block w-full border border-slate-200 rounded-xl shadow-sm py-2 sm:py-2.5 px-3 sm:px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-xs sm:text-sm bg-slate-50 focus:bg-white"
                     placeholder="Masukkan nama/alasan dispensasi"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-2">Kategori</label>
+                  <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5 sm:mb-2">Kategori</label>
                   <select
                     required
                     value={dispensationForm.category}
                     onChange={(e) => setDispensationForm({ ...dispensationForm, category: e.target.value })}
-                    className="block w-full border border-slate-200 rounded-xl shadow-sm py-2.5 px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all sm:text-sm bg-slate-50 focus:bg-white"
+                    className="block w-full border border-slate-200 rounded-xl shadow-sm py-2 sm:py-2.5 px-3 sm:px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-xs sm:text-sm bg-slate-50 focus:bg-white"
                   >
                     <option value="">Pilih Kategori...</option>
                     <option value="Dispensasi Keluarga">Dispensasi Keluarga</option>
@@ -315,17 +317,17 @@ export default function MasterData() {
               </>
             )}
 
-            <div className="sm:col-span-2 flex justify-end pt-4 border-t border-slate-100 mt-2">
+            <div className="sm:col-span-2 flex justify-end pt-2 sm:pt-3 border-t border-slate-100 mt-1">
               <button
                 type="button"
                 onClick={() => setShowAddForm(false)}
-                className="mr-3 bg-white py-2.5 px-6 border border-slate-200 rounded-xl shadow-sm text-sm font-bold text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 transition-all"
+                className="mr-2 sm:mr-3 bg-white py-1.5 sm:py-2 px-3 sm:px-4 border border-slate-200 rounded-lg shadow-sm text-[11px] sm:text-xs font-bold text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 transition-all"
               >
                 Batal
               </button>
               <button
                 type="submit"
-                className="bg-gradient-to-r from-indigo-600 to-purple-600 border border-transparent rounded-xl shadow-md py-2.5 px-6 inline-flex justify-center text-sm font-bold text-white hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                className="bg-gradient-to-r from-indigo-600 to-purple-600 border border-transparent rounded-lg shadow-md py-1.5 sm:py-2 px-3 sm:px-4 inline-flex justify-center text-[11px] sm:text-xs font-bold text-white hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
               >
                 Simpan Data
               </button>
@@ -334,68 +336,68 @@ export default function MasterData() {
         </div>
       )}
 
-      <div className="bg-white shadow-lg rounded-2xl border border-slate-100 flex-1 flex flex-col min-h-0 overflow-hidden">
+      <div className="bg-white shadow-lg rounded-xl border border-slate-100 flex-1 flex flex-col min-h-0 overflow-hidden">
         <div className="overflow-x-auto flex-1">
           <table className="min-w-full divide-y divide-slate-200">
             <thead className="bg-slate-50 sticky top-0 z-10">
               <tr>
-                <th className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">
+                <th className="px-3 sm:px-4 py-2 sm:py-2.5 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">
                   {activeTab === 'jenis_dispensasi' ? 'Nama Dispensasi' : 'Nama'}
                 </th>
                 {activeTab === 'siswa' && (
-                  <th className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Kelas</th>
+                  <th className="px-3 sm:px-4 py-2 sm:py-2.5 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Kelas</th>
                 )}
                 {activeTab === 'jenis_dispensasi' && (
-                  <th className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Kategori</th>
+                  <th className="px-3 sm:px-4 py-2 sm:py-2.5 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Kategori</th>
                 )}
-                <th className="px-6 py-4 text-right text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Aksi</th>
+                <th className="px-3 sm:px-4 py-2 sm:py-2.5 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Aksi</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-slate-100">
               {loading ? (
                 <tr>
-                  <td colSpan={4} className="px-6 py-12 text-center">
+                  <td colSpan={4} className="px-3 sm:px-4 py-6 sm:py-8 text-center">
                     <div className="flex flex-col items-center justify-center">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mb-4"></div>
-                      <span className="text-sm font-medium text-slate-500">Memuat data...</span>
+                      <div className="animate-spin rounded-full h-5 w-5 sm:h-6 sm:w-6 border-b-2 border-indigo-600 mb-2 sm:mb-3"></div>
+                      <span className="text-[11px] sm:text-xs font-medium text-slate-500">Memuat data...</span>
                     </div>
                   </td>
                 </tr>
               ) : data.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-6 py-12 text-center">
+                  <td colSpan={4} className="px-3 sm:px-4 py-6 sm:py-8 text-center">
                     <div className="flex flex-col items-center justify-center text-slate-400">
-                      <AlertCircle className="h-12 w-12 mb-3 text-slate-300" />
-                      <span className="text-base font-medium text-slate-500">Belum ada data</span>
-                      <span className="text-sm mt-1">Silakan tambah data manual atau import dari Excel.</span>
+                      <AlertCircle className="h-8 w-8 sm:h-10 sm:w-10 mb-2 text-slate-300" />
+                      <span className="text-xs sm:text-sm font-medium text-slate-500">Belum ada data</span>
+                      <span className="text-[10px] sm:text-[11px] mt-1">Silakan tambah data manual atau import dari Excel.</span>
                     </div>
                   </td>
                 </tr>
               ) : (
                 data.map((item) => (
                   <tr key={item.id} className="hover:bg-slate-50 transition-colors">
-                    <td className="px-6 py-4 text-sm font-semibold text-slate-800">{item.name}</td>
+                    <td className="px-3 sm:px-4 py-2 sm:py-2.5 text-[11px] sm:text-xs font-semibold text-slate-800">{item.name}</td>
                     {activeTab === 'siswa' && (
-                      <td className="px-6 py-4 text-sm text-slate-600">
-                        <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100">
+                      <td className="px-3 sm:px-4 py-2 sm:py-2.5 text-[11px] sm:text-xs text-slate-600">
+                        <span className="px-2 py-0.5 inline-flex text-[9px] sm:text-[10px] leading-4 font-semibold rounded-md bg-indigo-50 text-indigo-700 border border-indigo-100">
                           {item.class_name}
                         </span>
                       </td>
                     )}
                     {activeTab === 'jenis_dispensasi' && (
-                      <td className="px-6 py-4 text-sm text-slate-600">
-                        <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-50 text-purple-700 border border-purple-100">
+                      <td className="px-3 sm:px-4 py-2 sm:py-2.5 text-[11px] sm:text-xs text-slate-600">
+                        <span className="px-2 py-0.5 inline-flex text-[9px] sm:text-[10px] leading-4 font-semibold rounded-md bg-purple-50 text-purple-700 border border-purple-100">
                           {item.category}
                         </span>
                       </td>
                     )}
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <td className="px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap text-right text-[11px] sm:text-xs font-medium">
                       <button
                         onClick={() => setDeleteId(item.id)}
-                        className="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-2 rounded-lg transition-colors"
+                        className="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-1.5 rounded-md transition-colors"
                         title="Hapus"
                       >
-                        <Trash2 className="h-5 w-5" />
+                        <Trash2 className="h-3.5 w-3.5" />
                       </button>
                     </td>
                   </tr>

@@ -117,9 +117,9 @@ export default function Transaksi() {
   };
 
   return (
-    <div className="flex flex-col h-full space-y-6 pb-8">
+    <div className="flex flex-col h-full space-y-4 sm:space-y-6 pb-6">
       <div className="flex justify-between items-center flex-shrink-0">
-        <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">Transaksi Dispensasi</h1>
+        <h1 className="text-lg sm:text-xl md:text-2xl font-extrabold text-slate-800 tracking-tight">Transaksi Dispensasi</h1>
         <button
           onClick={() => {
             if (showAddForm) {
@@ -140,7 +140,7 @@ export default function Transaksi() {
               setShowAddForm(true);
             }
           }}
-          className={`inline-flex items-center px-4 py-2.5 border border-transparent shadow-md text-sm font-bold rounded-xl text-white transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] ${
+          className={`inline-flex items-center px-2.5 py-1.5 sm:px-3 sm:py-2 border border-transparent shadow-md text-xs font-bold rounded-lg text-white transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] ${
             showAddForm 
               ? 'bg-slate-500 hover:bg-slate-600' 
               : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700'
@@ -150,53 +150,54 @@ export default function Transaksi() {
             'Batal'
           ) : (
             <>
-              <Plus className="-ml-1 mr-2 h-5 w-5" />
-              Tambah Dispensasi
+              <Plus className="-ml-1 mr-1.5 h-4 w-4" />
+              <span className="hidden sm:inline">Tambah Dispensasi</span>
+              <span className="sm:hidden">Tambah</span>
             </>
           )}
         </button>
       </div>
 
       {showAddForm && (
-        <div className="bg-white shadow-lg rounded-2xl p-6 border border-slate-100 flex-shrink-0 animate-in fade-in slide-in-from-top-4 duration-300">
-          <div className="mb-6 pb-4 border-b border-slate-100">
-            <h3 className="text-lg font-bold text-slate-800">{editingId ? 'Edit Data Dispensasi' : 'Form Tambah Dispensasi'}</h3>
-            <p className="text-sm text-slate-500 mt-1">Silakan isi form di bawah ini dengan lengkap.</p>
+        <div className="bg-white shadow-lg rounded-xl p-3 sm:p-4 border border-slate-100 flex-shrink-0 animate-in fade-in slide-in-from-top-4 duration-300">
+          <div className="mb-3 sm:mb-4 pb-2 sm:pb-3 border-b border-slate-100">
+            <h3 className="text-sm sm:text-base font-bold text-slate-800">{editingId ? 'Edit Data Dispensasi' : 'Form Tambah Dispensasi'}</h3>
+            <p className="text-[10px] sm:text-xs text-slate-500 mt-1">Silakan isi form di bawah ini dengan lengkap.</p>
           </div>
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-6">
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-y-4 sm:gap-y-6 sm:grid-cols-2 sm:gap-x-6">
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Tanggal</label>
+              <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5 sm:mb-2">Tanggal</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Calendar className="h-5 w-5 text-slate-400" />
+                  <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-slate-400" />
                 </div>
                 <input
                   type="date"
                   required
                   value={formData.date}
                   onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                  className="block w-full pl-10 border border-slate-200 rounded-xl shadow-sm py-2.5 px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all sm:text-sm bg-slate-50 focus:bg-white"
+                  className="block w-full pl-9 sm:pl-10 border border-slate-200 rounded-xl shadow-sm py-2 sm:py-2.5 px-3 sm:px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-xs sm:text-sm bg-slate-50 focus:bg-white"
                 />
               </div>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Jam</label>
+              <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5 sm:mb-2">Jam</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Clock className="h-5 w-5 text-slate-400" />
+                  <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-slate-400" />
                 </div>
                 <input
                   type="time"
                   required
                   value={formData.time}
                   onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                  className="block w-full pl-10 border border-slate-200 rounded-xl shadow-sm py-2.5 px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all sm:text-sm bg-slate-50 focus:bg-white"
+                  className="block w-full pl-9 sm:pl-10 border border-slate-200 rounded-xl shadow-sm py-2 sm:py-2.5 px-3 sm:px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-xs sm:text-sm bg-slate-50 focus:bg-white"
                 />
               </div>
             </div>
-            <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Kelas</label>
+                <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5 sm:mb-2">Kelas</label>
                 <select
                   required
                   value={selectedClass}
@@ -204,7 +205,7 @@ export default function Transaksi() {
                     setSelectedClass(e.target.value);
                     setFormData({ ...formData, student_id: '' }); // Reset student when class changes
                   }}
-                  className="block w-full border border-slate-200 rounded-xl shadow-sm py-2.5 px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all sm:text-sm bg-slate-50 focus:bg-white"
+                  className="block w-full border border-slate-200 rounded-xl shadow-sm py-2 sm:py-2.5 px-3 sm:px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-xs sm:text-sm bg-slate-50 focus:bg-white"
                 >
                   <option value="">Pilih Kelas...</option>
                   {CLASSES.map((c) => (
@@ -213,17 +214,17 @@ export default function Transaksi() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Siswa</label>
+                <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5 sm:mb-2">Siswa</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <User className="h-5 w-5 text-slate-400" />
+                    <User className="h-4 w-4 sm:h-5 sm:w-5 text-slate-400" />
                   </div>
                   <select
                     required
                     value={formData.student_id}
                     onChange={(e) => setFormData({ ...formData, student_id: e.target.value })}
                     disabled={!selectedClass}
-                    className="block w-full pl-10 border border-slate-200 rounded-xl shadow-sm py-2.5 px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all sm:text-sm bg-slate-50 focus:bg-white disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
+                    className="block w-full pl-9 sm:pl-10 border border-slate-200 rounded-xl shadow-sm py-2 sm:py-2.5 px-3 sm:px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-xs sm:text-sm bg-slate-50 focus:bg-white disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
                   >
                     <option value="">{selectedClass ? 'Pilih Siswa...' : 'Pilih Kelas Terlebih Dahulu'}</option>
                     {filteredStudents.map((student) => (
@@ -236,12 +237,12 @@ export default function Transaksi() {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Jenis Dispensasi</label>
+              <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5 sm:mb-2">Jenis Dispensasi</label>
               <select
                 required
                 value={formData.type}
                 onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                className="block w-full border border-slate-200 rounded-xl shadow-sm py-2.5 px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all sm:text-sm bg-slate-50 focus:bg-white"
+                className="block w-full border border-slate-200 rounded-xl shadow-sm py-2 sm:py-2.5 px-3 sm:px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-xs sm:text-sm bg-slate-50 focus:bg-white"
               >
                 <option value="">Pilih Jenis...</option>
                 {dispensationTypes.map((type) => (
@@ -252,28 +253,28 @@ export default function Transaksi() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Alasan</label>
+              <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5 sm:mb-2">Alasan</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FileText className="h-5 w-5 text-slate-400" />
+                  <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-slate-400" />
                 </div>
                 <input
                   type="text"
                   required
                   value={formData.reason}
                   onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
-                  className="block w-full pl-10 border border-slate-200 rounded-xl shadow-sm py-2.5 px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all sm:text-sm bg-slate-50 focus:bg-white"
+                  className="block w-full pl-9 sm:pl-10 border border-slate-200 rounded-xl shadow-sm py-2 sm:py-2.5 px-3 sm:px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-xs sm:text-sm bg-slate-50 focus:bg-white"
                   placeholder="Masukkan alasan detail"
                 />
               </div>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Nama Wali Kelas</label>
+              <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5 sm:mb-2">Nama Wali Kelas</label>
               <select
                 required
                 value={formData.homeroom_teacher}
                 onChange={(e) => setFormData({ ...formData, homeroom_teacher: e.target.value })}
-                className="block w-full border border-slate-200 rounded-xl shadow-sm py-2.5 px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all sm:text-sm bg-slate-50 focus:bg-white"
+                className="block w-full border border-slate-200 rounded-xl shadow-sm py-2 sm:py-2.5 px-3 sm:px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-xs sm:text-sm bg-slate-50 focus:bg-white"
               >
                 <option value="">Pilih Wali Kelas...</option>
                 {homeroomTeachers.map((teacher) => (
@@ -284,12 +285,12 @@ export default function Transaksi() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Nama Guru BK</label>
+              <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5 sm:mb-2">Nama Guru BK</label>
               <select
                 required
                 value={formData.bk_teacher}
                 onChange={(e) => setFormData({ ...formData, bk_teacher: e.target.value })}
-                className="block w-full border border-slate-200 rounded-xl shadow-sm py-2.5 px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all sm:text-sm bg-slate-50 focus:bg-white"
+                className="block w-full border border-slate-200 rounded-xl shadow-sm py-2 sm:py-2.5 px-3 sm:px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-xs sm:text-sm bg-slate-50 focus:bg-white"
               >
                 <option value="">Pilih Guru BK...</option>
                 {bkTeachers.map((teacher) => (
@@ -300,16 +301,16 @@ export default function Transaksi() {
               </select>
             </div>
             <div className="sm:col-span-2">
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Tindak Lanjut</label>
+              <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5 sm:mb-2">Tindak Lanjut</label>
               <textarea
-                rows={3}
+                rows={2}
                 value={formData.follow_up}
                 onChange={(e) => setFormData({ ...formData, follow_up: e.target.value })}
-                className="block w-full border border-slate-200 rounded-xl shadow-sm py-3 px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all sm:text-sm bg-slate-50 focus:bg-white resize-none"
+                className="block w-full border border-slate-200 rounded-xl shadow-sm py-2 sm:py-3 px-3 sm:px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-xs sm:text-sm bg-slate-50 focus:bg-white resize-none"
                 placeholder="Catatan tindak lanjut (opsional)"
               />
             </div>
-            <div className="sm:col-span-2 flex justify-end pt-4 border-t border-slate-100 mt-2">
+            <div className="sm:col-span-2 flex justify-end pt-2 sm:pt-3 border-t border-slate-100 mt-1">
               <button
                 type="button"
                 onClick={() => {
@@ -327,13 +328,13 @@ export default function Transaksi() {
                   });
                   setSelectedClass('');
                 }}
-                className="mr-3 bg-white py-2.5 px-6 border border-slate-200 rounded-xl shadow-sm text-sm font-bold text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 transition-all"
+                className="mr-2 sm:mr-3 bg-white py-1.5 sm:py-2 px-3 sm:px-4 border border-slate-200 rounded-lg shadow-sm text-[11px] sm:text-xs font-bold text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 transition-all"
               >
                 Batal
               </button>
               <button
                 type="submit"
-                className="bg-gradient-to-r from-indigo-600 to-purple-600 border border-transparent rounded-xl shadow-md py-2.5 px-6 inline-flex justify-center text-sm font-bold text-white hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                className="bg-gradient-to-r from-indigo-600 to-purple-600 border border-transparent rounded-lg shadow-md py-1.5 sm:py-2 px-3 sm:px-4 inline-flex justify-center text-[11px] sm:text-xs font-bold text-white hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
               >
                 {editingId ? 'Simpan Perubahan' : 'Simpan Data'}
               </button>
@@ -342,78 +343,78 @@ export default function Transaksi() {
         </div>
       )}
 
-      <div className="bg-white shadow-lg rounded-2xl border border-slate-100 flex-1 flex flex-col min-h-0 overflow-hidden">
+      <div className="bg-white shadow-lg rounded-xl border border-slate-100 flex-1 flex flex-col min-h-0 overflow-hidden">
         <div className="overflow-x-auto flex-1">
           <table className="min-w-full divide-y divide-slate-200">
             <thead className="bg-slate-50 sticky top-0 z-10">
               <tr>
-                <th className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Waktu</th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Siswa</th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Jenis</th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Alasan</th>
-                <th className="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Tindak Lanjut</th>
-                <th className="px-6 py-4 text-right text-xs font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Aksi</th>
+                <th className="px-3 sm:px-4 py-2 sm:py-2.5 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Waktu</th>
+                <th className="px-3 sm:px-4 py-2 sm:py-2.5 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Siswa</th>
+                <th className="px-3 sm:px-4 py-2 sm:py-2.5 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Jenis</th>
+                <th className="px-3 sm:px-4 py-2 sm:py-2.5 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Alasan</th>
+                <th className="px-3 sm:px-4 py-2 sm:py-2.5 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Tindak Lanjut</th>
+                <th className="px-3 sm:px-4 py-2 sm:py-2.5 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Aksi</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-slate-100">
               {loading ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center">
+                  <td colSpan={6} className="px-3 sm:px-4 py-6 sm:py-8 text-center">
                     <div className="flex flex-col items-center justify-center">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mb-4"></div>
-                      <span className="text-sm font-medium text-slate-500">Memuat data transaksi...</span>
+                      <div className="animate-spin rounded-full h-5 w-5 sm:h-6 sm:w-6 border-b-2 border-indigo-600 mb-2 sm:mb-3"></div>
+                      <span className="text-[11px] sm:text-xs font-medium text-slate-500">Memuat data transaksi...</span>
                     </div>
                   </td>
                 </tr>
               ) : dispensations.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center">
+                  <td colSpan={6} className="px-3 sm:px-4 py-6 sm:py-8 text-center">
                     <div className="flex flex-col items-center justify-center text-slate-400">
-                      <AlertCircle className="h-12 w-12 mb-3 text-slate-300" />
-                      <span className="text-base font-medium text-slate-500">Belum ada data transaksi</span>
-                      <span className="text-sm mt-1">Silakan tambah data dispensasi baru.</span>
+                      <AlertCircle className="h-8 w-8 sm:h-10 sm:w-10 mb-2 text-slate-300" />
+                      <span className="text-xs sm:text-sm font-medium text-slate-500">Belum ada data transaksi</span>
+                      <span className="text-[10px] sm:text-[11px] mt-1">Silakan tambah data dispensasi baru.</span>
                     </div>
                   </td>
                 </tr>
               ) : (
                 dispensations.map((item) => (
                   <tr key={item.id} className="hover:bg-slate-50 transition-colors">
-                    <td className="px-6 py-4 text-sm text-slate-900">
+                    <td className="px-3 sm:px-4 py-2 sm:py-2.5 text-[11px] sm:text-xs text-slate-900">
                       <div className="whitespace-nowrap font-semibold">{item.date}</div>
-                      <div className="whitespace-nowrap text-slate-500 text-xs mt-1 bg-slate-100 inline-block px-2 py-0.5 rounded-md">{item.time}</div>
+                      <div className="whitespace-nowrap text-slate-500 text-[9px] sm:text-[10px] mt-1 bg-slate-100 inline-block px-1.5 py-0.5 rounded-md">{item.time}</div>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-3 sm:px-4 py-2 sm:py-2.5">
                       <div className="flex items-center">
-                        <div className="h-8 w-8 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-xs mr-3 flex-shrink-0">
+                        <div className="h-6 w-6 sm:h-7 sm:w-7 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-[9px] sm:text-[10px] mr-2 flex-shrink-0">
                           {item.student_name.charAt(0)}
                         </div>
                         <div>
-                          <div className="text-sm font-bold text-slate-800">{item.student_name}</div>
-                          <div className="text-xs font-medium text-indigo-600 bg-indigo-50 inline-block px-2 py-0.5 rounded-md mt-1">{item.class_name}</div>
+                          <div className="text-[11px] sm:text-xs font-bold text-slate-800">{item.student_name}</div>
+                          <div className="text-[9px] sm:text-[10px] font-medium text-indigo-600 bg-indigo-50 inline-block px-1.5 py-0.5 rounded-md mt-0.5">{item.class_name}</div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-600">
-                      <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-50 text-purple-700 border border-purple-100">
+                    <td className="px-3 sm:px-4 py-2 sm:py-2.5 text-[11px] sm:text-xs text-slate-600">
+                      <span className="px-2 py-0.5 inline-flex text-[9px] sm:text-[10px] leading-4 font-semibold rounded-md bg-purple-50 text-purple-700 border border-purple-100">
                         {item.type}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-600 max-w-xs truncate" title={item.reason}>{item.reason}</td>
-                    <td className="px-6 py-4 text-sm text-slate-600 max-w-xs truncate" title={item.follow_up}>{item.follow_up || '-'}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <td className="px-3 sm:px-4 py-2 sm:py-2.5 text-[11px] sm:text-xs text-slate-600 max-w-[100px] sm:max-w-[150px] truncate" title={item.reason}>{item.reason}</td>
+                    <td className="px-3 sm:px-4 py-2 sm:py-2.5 text-[11px] sm:text-xs text-slate-600 max-w-[100px] sm:max-w-[150px] truncate" title={item.follow_up}>{item.follow_up || '-'}</td>
+                    <td className="px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap text-right text-[11px] sm:text-xs font-medium">
                       <button
                         onClick={() => handleEdit(item)}
-                        className="text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 p-2 rounded-lg transition-colors mr-2"
+                        className="text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 p-1.5 rounded-md transition-colors mr-1"
                         title="Edit"
                       >
-                        <Edit2 className="h-4 w-4" />
+                        <Edit2 className="h-3.5 w-3.5" />
                       </button>
                       <button
                         onClick={() => setDeleteId(item.id)}
-                        className="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-2 rounded-lg transition-colors"
+                        className="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-1.5 rounded-md transition-colors"
                         title="Hapus"
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2 className="h-3.5 w-3.5" />
                       </button>
                     </td>
                   </tr>
