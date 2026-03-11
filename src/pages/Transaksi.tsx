@@ -164,40 +164,40 @@ export default function Transaksi() {
             <h3 className="text-sm sm:text-base font-bold text-slate-800">{editingId ? 'Edit Data Dispensasi' : 'Form Tambah Dispensasi'}</h3>
             <p className="text-[10px] sm:text-xs text-slate-500 mt-1">Silakan isi form di bawah ini dengan lengkap.</p>
           </div>
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-y-4 sm:gap-y-6 sm:grid-cols-2 sm:gap-x-6">
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-y-3 sm:gap-y-4 sm:grid-cols-2 sm:gap-x-4">
             <div>
-              <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5 sm:mb-2">Tanggal</label>
+              <label className="block text-[11px] sm:text-xs font-semibold text-slate-700 mb-1">Tanggal</label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-slate-400" />
+                <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
+                  <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-slate-400" />
                 </div>
                 <input
                   type="date"
                   required
                   value={formData.date}
                   onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                  className="block w-full pl-9 sm:pl-10 border border-slate-200 rounded-xl shadow-sm py-2 sm:py-2.5 px-3 sm:px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-xs sm:text-sm bg-slate-50 focus:bg-white"
+                  className="block w-full pl-8 sm:pl-9 border border-slate-200 rounded-lg shadow-sm py-1.5 sm:py-2 px-2.5 sm:px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-[11px] sm:text-xs bg-slate-50 focus:bg-white"
                 />
               </div>
             </div>
             <div>
-              <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5 sm:mb-2">Jam</label>
+              <label className="block text-[11px] sm:text-xs font-semibold text-slate-700 mb-1">Jam</label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-slate-400" />
+                <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
+                  <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-slate-400" />
                 </div>
                 <input
                   type="time"
                   required
                   value={formData.time}
                   onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-                  className="block w-full pl-9 sm:pl-10 border border-slate-200 rounded-xl shadow-sm py-2 sm:py-2.5 px-3 sm:px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-xs sm:text-sm bg-slate-50 focus:bg-white"
+                  className="block w-full pl-8 sm:pl-9 border border-slate-200 rounded-lg shadow-sm py-1.5 sm:py-2 px-2.5 sm:px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-[11px] sm:text-xs bg-slate-50 focus:bg-white"
                 />
               </div>
             </div>
-            <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+            <div className="sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
-                <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5 sm:mb-2">Kelas</label>
+                <label className="block text-[11px] sm:text-xs font-semibold text-slate-700 mb-1">Kelas</label>
                 <select
                   required
                   value={selectedClass}
@@ -205,7 +205,7 @@ export default function Transaksi() {
                     setSelectedClass(e.target.value);
                     setFormData({ ...formData, student_id: '' }); // Reset student when class changes
                   }}
-                  className="block w-full border border-slate-200 rounded-xl shadow-sm py-2 sm:py-2.5 px-3 sm:px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-xs sm:text-sm bg-slate-50 focus:bg-white"
+                  className="block w-full border border-slate-200 rounded-lg shadow-sm py-1.5 sm:py-2 px-2.5 sm:px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-[11px] sm:text-xs bg-slate-50 focus:bg-white"
                 >
                   <option value="">Pilih Kelas...</option>
                   {CLASSES.map((c) => (
@@ -214,17 +214,17 @@ export default function Transaksi() {
                 </select>
               </div>
               <div>
-                <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5 sm:mb-2">Siswa</label>
+                <label className="block text-[11px] sm:text-xs font-semibold text-slate-700 mb-1">Siswa</label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <User className="h-4 w-4 sm:h-5 sm:w-5 text-slate-400" />
+                  <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
+                    <User className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-slate-400" />
                   </div>
                   <select
                     required
                     value={formData.student_id}
                     onChange={(e) => setFormData({ ...formData, student_id: e.target.value })}
                     disabled={!selectedClass}
-                    className="block w-full pl-9 sm:pl-10 border border-slate-200 rounded-xl shadow-sm py-2 sm:py-2.5 px-3 sm:px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-xs sm:text-sm bg-slate-50 focus:bg-white disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
+                    className="block w-full pl-8 sm:pl-9 border border-slate-200 rounded-lg shadow-sm py-1.5 sm:py-2 px-2.5 sm:px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-[11px] sm:text-xs bg-slate-50 focus:bg-white disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed"
                   >
                     <option value="">{selectedClass ? 'Pilih Siswa...' : 'Pilih Kelas Terlebih Dahulu'}</option>
                     {filteredStudents.map((student) => (
@@ -237,12 +237,12 @@ export default function Transaksi() {
               </div>
             </div>
             <div>
-              <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5 sm:mb-2">Jenis Dispensasi</label>
+              <label className="block text-[11px] sm:text-xs font-semibold text-slate-700 mb-1">Jenis Dispensasi</label>
               <select
                 required
                 value={formData.type}
                 onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                className="block w-full border border-slate-200 rounded-xl shadow-sm py-2 sm:py-2.5 px-3 sm:px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-xs sm:text-sm bg-slate-50 focus:bg-white"
+                className="block w-full border border-slate-200 rounded-lg shadow-sm py-1.5 sm:py-2 px-2.5 sm:px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-[11px] sm:text-xs bg-slate-50 focus:bg-white"
               >
                 <option value="">Pilih Jenis...</option>
                 {dispensationTypes.map((type) => (
@@ -253,28 +253,28 @@ export default function Transaksi() {
               </select>
             </div>
             <div>
-              <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5 sm:mb-2">Alasan</label>
+              <label className="block text-[11px] sm:text-xs font-semibold text-slate-700 mb-1">Alasan</label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-slate-400" />
+                <div className="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none">
+                  <FileText className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-slate-400" />
                 </div>
                 <input
                   type="text"
                   required
                   value={formData.reason}
                   onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
-                  className="block w-full pl-9 sm:pl-10 border border-slate-200 rounded-xl shadow-sm py-2 sm:py-2.5 px-3 sm:px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-xs sm:text-sm bg-slate-50 focus:bg-white"
+                  className="block w-full pl-8 sm:pl-9 border border-slate-200 rounded-lg shadow-sm py-1.5 sm:py-2 px-2.5 sm:px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-[11px] sm:text-xs bg-slate-50 focus:bg-white"
                   placeholder="Masukkan alasan detail"
                 />
               </div>
             </div>
             <div>
-              <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5 sm:mb-2">Nama Wali Kelas</label>
+              <label className="block text-[11px] sm:text-xs font-semibold text-slate-700 mb-1">Nama Wali Kelas</label>
               <select
                 required
                 value={formData.homeroom_teacher}
                 onChange={(e) => setFormData({ ...formData, homeroom_teacher: e.target.value })}
-                className="block w-full border border-slate-200 rounded-xl shadow-sm py-2 sm:py-2.5 px-3 sm:px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-xs sm:text-sm bg-slate-50 focus:bg-white"
+                className="block w-full border border-slate-200 rounded-lg shadow-sm py-1.5 sm:py-2 px-2.5 sm:px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-[11px] sm:text-xs bg-slate-50 focus:bg-white"
               >
                 <option value="">Pilih Wali Kelas...</option>
                 {homeroomTeachers.map((teacher) => (
@@ -285,12 +285,12 @@ export default function Transaksi() {
               </select>
             </div>
             <div>
-              <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5 sm:mb-2">Nama Guru BK</label>
+              <label className="block text-[11px] sm:text-xs font-semibold text-slate-700 mb-1">Nama Guru BK</label>
               <select
                 required
                 value={formData.bk_teacher}
                 onChange={(e) => setFormData({ ...formData, bk_teacher: e.target.value })}
-                className="block w-full border border-slate-200 rounded-xl shadow-sm py-2 sm:py-2.5 px-3 sm:px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-xs sm:text-sm bg-slate-50 focus:bg-white"
+                className="block w-full border border-slate-200 rounded-lg shadow-sm py-1.5 sm:py-2 px-2.5 sm:px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-[11px] sm:text-xs bg-slate-50 focus:bg-white"
               >
                 <option value="">Pilih Guru BK...</option>
                 {bkTeachers.map((teacher) => (
@@ -301,12 +301,12 @@ export default function Transaksi() {
               </select>
             </div>
             <div className="sm:col-span-2">
-              <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5 sm:mb-2">Tindak Lanjut</label>
+              <label className="block text-[11px] sm:text-xs font-semibold text-slate-700 mb-1">Tindak Lanjut</label>
               <textarea
                 rows={2}
                 value={formData.follow_up}
                 onChange={(e) => setFormData({ ...formData, follow_up: e.target.value })}
-                className="block w-full border border-slate-200 rounded-xl shadow-sm py-2 sm:py-3 px-3 sm:px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-xs sm:text-sm bg-slate-50 focus:bg-white resize-none"
+                className="block w-full border border-slate-200 rounded-lg shadow-sm py-1.5 sm:py-2 px-2.5 sm:px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-[11px] sm:text-xs bg-slate-50 focus:bg-white resize-none"
                 placeholder="Catatan tindak lanjut (opsional)"
               />
             </div>

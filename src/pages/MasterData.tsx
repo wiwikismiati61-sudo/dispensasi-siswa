@@ -244,28 +244,28 @@ export default function MasterData() {
             <h3 className="text-sm sm:text-base font-bold text-slate-800">Form Tambah Data</h3>
             <p className="text-[10px] sm:text-xs text-slate-500 mt-1">Silakan isi form di bawah ini untuk menambahkan data baru.</p>
           </div>
-          <form onSubmit={handleAdd} className="grid grid-cols-1 gap-y-4 sm:gap-y-6 sm:grid-cols-2 sm:gap-x-6">
+          <form onSubmit={handleAdd} className="grid grid-cols-1 gap-y-3 sm:gap-y-4 sm:grid-cols-2 sm:gap-x-4">
             {activeTab === 'siswa' && (
               <>
                 <div>
-                  <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5 sm:mb-2">Nama Siswa</label>
+                  <label className="block text-[11px] sm:text-xs font-semibold text-slate-700 mb-1">Nama Siswa</label>
                   <input
                     type="text"
                     required
                     value={studentForm.name}
                     onChange={(e) => setStudentForm({ ...studentForm, name: e.target.value })}
-                    className="block w-full border border-slate-200 rounded-xl shadow-sm py-2 sm:py-2.5 px-3 sm:px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-xs sm:text-sm bg-slate-50 focus:bg-white"
+                    className="block w-full border border-slate-200 rounded-lg shadow-sm py-1.5 sm:py-2 px-2.5 sm:px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-[11px] sm:text-xs bg-slate-50 focus:bg-white"
                     placeholder="Masukkan nama siswa"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5 sm:mb-2">Kelas</label>
+                  <label className="block text-[11px] sm:text-xs font-semibold text-slate-700 mb-1">Kelas</label>
                   <input
                     type="text"
                     required
                     value={studentForm.class_name}
                     onChange={(e) => setStudentForm({ ...studentForm, class_name: e.target.value })}
-                    className="block w-full border border-slate-200 rounded-xl shadow-sm py-2 sm:py-2.5 px-3 sm:px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-xs sm:text-sm bg-slate-50 focus:bg-white"
+                    className="block w-full border border-slate-200 rounded-lg shadow-sm py-1.5 sm:py-2 px-2.5 sm:px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-[11px] sm:text-xs bg-slate-50 focus:bg-white"
                     placeholder="Contoh: X RPL 1"
                   />
                 </div>
@@ -274,13 +274,13 @@ export default function MasterData() {
 
             {(activeTab === 'wali_kelas' || activeTab === 'guru_bk') && (
               <div className="sm:col-span-2">
-                <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5 sm:mb-2">Nama Guru</label>
+                <label className="block text-[11px] sm:text-xs font-semibold text-slate-700 mb-1">Nama Guru</label>
                 <input
                   type="text"
                   required
                   value={teacherForm.name}
                   onChange={(e) => setTeacherForm({ ...teacherForm, name: e.target.value })}
-                  className="block w-full border border-slate-200 rounded-xl shadow-sm py-2 sm:py-2.5 px-3 sm:px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-xs sm:text-sm bg-slate-50 focus:bg-white"
+                  className="block w-full border border-slate-200 rounded-lg shadow-sm py-1.5 sm:py-2 px-2.5 sm:px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-[11px] sm:text-xs bg-slate-50 focus:bg-white"
                   placeholder="Masukkan nama guru beserta gelar"
                 />
               </div>
@@ -289,23 +289,23 @@ export default function MasterData() {
             {activeTab === 'jenis_dispensasi' && (
               <>
                 <div>
-                  <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5 sm:mb-2">Nama Dispensasi</label>
+                  <label className="block text-[11px] sm:text-xs font-semibold text-slate-700 mb-1">Nama Dispensasi</label>
                   <input
                     type="text"
                     required
                     value={dispensationForm.name}
                     onChange={(e) => setDispensationForm({ ...dispensationForm, name: e.target.value })}
-                    className="block w-full border border-slate-200 rounded-xl shadow-sm py-2 sm:py-2.5 px-3 sm:px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-xs sm:text-sm bg-slate-50 focus:bg-white"
+                    className="block w-full border border-slate-200 rounded-lg shadow-sm py-1.5 sm:py-2 px-2.5 sm:px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-[11px] sm:text-xs bg-slate-50 focus:bg-white"
                     placeholder="Masukkan nama/alasan dispensasi"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5 sm:mb-2">Kategori</label>
+                  <label className="block text-[11px] sm:text-xs font-semibold text-slate-700 mb-1">Kategori</label>
                   <select
                     required
                     value={dispensationForm.category}
                     onChange={(e) => setDispensationForm({ ...dispensationForm, category: e.target.value })}
-                    className="block w-full border border-slate-200 rounded-xl shadow-sm py-2 sm:py-2.5 px-3 sm:px-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-xs sm:text-sm bg-slate-50 focus:bg-white"
+                    className="block w-full border border-slate-200 rounded-lg shadow-sm py-1.5 sm:py-2 px-2.5 sm:px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-[11px] sm:text-xs bg-slate-50 focus:bg-white"
                   >
                     <option value="">Pilih Kategori...</option>
                     <option value="Dispensasi Keluarga">Dispensasi Keluarga</option>
