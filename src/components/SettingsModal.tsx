@@ -1,43 +1,7 @@
-import React, { useState } from 'react';
-import { api } from '../lib/api';
-import { X, Lock, Database, Download, Upload, ShieldCheck, AlertCircle } from 'lucide-react';
+import React from 'react';
+import { X, Database, Download, Upload, ShieldCheck, AlertCircle } from 'lucide-react';
 
 export default function SettingsModal({ onClose }: { onClose: () => void }) {
-  const [oldPassword, setOldPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setSuccess('');
-
-    if (newPassword !== confirmPassword) {
-      setError('Password baru tidak cocok');
-      return;
-    }
-
-    try {
-      const user = JSON.parse(localStorage.getItem('user') || '{}');
-      const res = await api.post('/change-password', {
-        username: user.username,
-        oldPassword,
-        newPassword,
-      });
-
-      if (res.success) {
-        setSuccess('Password berhasil diubah');
-        setOldPassword('');
-        setNewPassword('');
-        setConfirmPassword('');
-      }
-    } catch (err: any) {
-      setError('Gagal mengubah password. Pastikan password lama benar.');
-    }
-  };
-
   const handleBackup = () => {
     window.open('/api/backup', '_blank');
   };
@@ -87,70 +51,6 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
           <div className="bg-white px-3 sm:px-4 pt-3 sm:pt-4 pb-3 sm:pb-4">
             <div className="space-y-4 sm:space-y-6">
               <div>
-                <div className="flex items-center mb-2 sm:mb-3">
-                  <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-indigo-100 flex items-center justify-center mr-2">
-                    <Lock className="h-3 w-3 sm:h-4 sm:w-4 text-indigo-600" />
-                  </div>
-                  <h4 className="text-sm sm:text-base font-bold text-slate-800">Ubah Password</h4>
-                </div>
-                
-                <form onSubmit={handleSubmit} className="space-y-3">
-                  {error && (
-                    <div className="bg-red-50 border-l-4 border-red-500 p-2 sm:p-3 rounded-r-md flex items-start">
-                      <AlertCircle className="h-4 w-4 sm:h-5 sm:w-5 text-red-500 mr-2 flex-shrink-0 mt-0.5" />
-                      <p className="text-xs sm:text-sm text-red-700">{error}</p>
-                    </div>
-                  )}
-                  {success && (
-                    <div className="bg-emerald-50 border-l-4 border-emerald-500 p-2 sm:p-3 rounded-r-md flex items-start">
-                      <ShieldCheck className="h-4 w-4 sm:h-5 sm:w-5 text-emerald-500 mr-2 flex-shrink-0 mt-0.5" />
-                      <p className="text-xs sm:text-sm text-emerald-700">{success}</p>
-                    </div>
-                  )}
-                  
-                  <div>
-                    <label className="block text-[11px] sm:text-xs font-semibold text-slate-700 mb-1">Password Lama</label>
-                    <input
-                      type="password"
-                      required
-                      value={oldPassword}
-                      onChange={(e) => setOldPassword(e.target.value)}
-                      className="block w-full border border-slate-200 rounded-lg shadow-sm py-1.5 sm:py-2 px-2.5 sm:px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-[11px] sm:text-xs bg-slate-50 focus:bg-white"
-                      placeholder="Masukkan password saat ini"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] sm:text-xs font-semibold text-slate-700 mb-1">Password Baru</label>
-                    <input
-                      type="password"
-                      required
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      className="block w-full border border-slate-200 rounded-lg shadow-sm py-1.5 sm:py-2 px-2.5 sm:px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-[11px] sm:text-xs bg-slate-50 focus:bg-white"
-                      placeholder="Masukkan password baru"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] sm:text-xs font-semibold text-slate-700 mb-1">Konfirmasi Password Baru</label>
-                    <input
-                      type="password"
-                      required
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="block w-full border border-slate-200 rounded-lg shadow-sm py-1.5 sm:py-2 px-2.5 sm:px-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-[11px] sm:text-xs bg-slate-50 focus:bg-white"
-                      placeholder="Ulangi password baru"
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    className="w-full inline-flex justify-center items-center rounded-lg border border-transparent shadow-md px-3 py-1.5 sm:py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-[11px] sm:text-xs font-bold text-white hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
-                  >
-                    Simpan Password Baru
-                  </button>
-                </form>
-              </div>
-
-              <div className="border-t border-slate-100 pt-3 sm:pt-4">
                 <div className="flex items-center mb-2 sm:mb-3">
                   <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-emerald-100 flex items-center justify-center mr-2">
                     <Database className="h-3 w-3 sm:h-4 sm:w-4 text-emerald-600" />

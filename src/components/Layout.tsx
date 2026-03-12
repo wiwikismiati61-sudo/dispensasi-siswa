@@ -1,9 +1,9 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Database, FileText, Settings, LogOut, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Database, FileText, Settings, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import SettingsModal from './SettingsModal';
 
-export default function Layout({ onLogout }: { onLogout: () => void }) {
+export default function Layout() {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -64,13 +64,6 @@ export default function Layout({ onLogout }: { onLogout: () => void }) {
             >
               <Settings className="mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-slate-400 group-hover:text-indigo-500" />
               Pengaturan
-            </button>
-            <button
-              onClick={onLogout}
-              className="flex items-center w-full px-2 sm:px-3 py-1.5 sm:py-2 text-[11px] sm:text-xs font-semibold text-red-600 rounded-lg hover:bg-red-50 hover:text-red-700 transition-all duration-200"
-            >
-              <LogOut className="mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-red-500" />
-              Keluar
             </button>
           </div>
         </div>
@@ -165,13 +158,6 @@ export default function Layout({ onLogout }: { onLogout: () => void }) {
               >
                 <Settings className="mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-slate-400" />
                 Pengaturan
-              </button>
-              <button
-                onClick={onLogout}
-                className="flex items-center w-full px-2 py-1.5 text-[11px] sm:text-xs font-semibold text-red-600 rounded-lg hover:bg-red-50 hover:text-red-700 transition-all duration-200"
-              >
-                <LogOut className="mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-red-500" />
-                Keluar
               </button>
             </div>
           </div>
