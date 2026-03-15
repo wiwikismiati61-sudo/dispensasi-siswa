@@ -1,3 +1,4 @@
+import React, { useEffect } from 'react';
 import { useAuth } from '../components/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { LogIn } from 'lucide-react';
@@ -9,17 +10,30 @@ export default function LoginPage() {
   const location = useLocation();
   const from = location.state?.from?.pathname || '/dashboard';
 
+  const [error, setError] = React.useState<string | null>(null);
+
+  useEffect(() => {
+    if (user) {
+      navigate(from, { replace: true });
+    }
+  }, [user, navigate, from]);
+
   if (user) {
-    navigate(from, { replace: true });
     return null;
   }
 
   const handleLogin = async () => {
+    setError(null);
     try {
       await login();
       navigate(from, { replace: true });
-    } catch (error) {
-      console.error('Login failed:', error);
+    } catch (err: any) {
+      console.error('Login failed:', err);
+      if (err.code === 'auth/unauthorized-domain') {
+        setError('Domain ini belum diizinkan di Firebase Console. Silakan tambahkan domain Vercel Anda ke "Authorized Domains" di Firebase Authentication.');
+      } else {
+        setError('Gagal masuk: ' + (err.message || 'Terjadi kesalahan yang tidak diketahui'));
+      }
     }
   };
 
@@ -37,6 +51,12 @@ export default function LoginPage() {
           <h2 className="text-3xl font-bold text-gray-900">Selamat Datang</h2>
           <p className="mt-2 text-gray-600">Silakan masuk untuk mengakses fitur aplikasi</p>
         </div>
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm">
+            {error}
+          </div>
+        )}
 
         <button
           onClick={handleLogin}
