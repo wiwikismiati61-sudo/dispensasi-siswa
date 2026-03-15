@@ -32,12 +32,12 @@ export default function Laporan() {
   const fetchData = async () => {
     try {
       const [dispData, studentsData] = await Promise.all([
-        api.get('/dispensations'),
-        api.get('/students')
+        api.getDispensations(),
+        api.getStudents()
       ]);
-      setDispensations(dispData);
+      setDispensations(dispData || []);
       
-      const uniqueClasses = Array.from(new Set(studentsData.map((s: any) => s.class_name))).filter(Boolean).sort() as string[];
+      const uniqueClasses = Array.from(new Set((studentsData || []).map((s: any) => s.class_name))).filter(Boolean).sort() as string[];
       setClasses(uniqueClasses);
     } catch (error) {
       console.error('Failed to fetch data', error);

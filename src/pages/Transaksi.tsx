@@ -33,17 +33,17 @@ export default function Transaksi() {
   const fetchData = async () => {
     try {
       const [dispRes, studRes, hrRes, bkRes, typeRes] = await Promise.all([
-        api.get('/dispensations'),
-        api.get('/students'),
-        api.get('/homeroom-teachers'),
-        api.get('/bk-teachers'),
-        api.get('/dispensation-types')
+        api.getDispensations(),
+        api.getStudents(),
+        api.getTeachers('homeroom'),
+        api.getTeachers('bk'),
+        api.getDispensationTypes()
       ]);
-      setDispensations(dispRes);
-      setStudents(studRes);
-      setHomeroomTeachers(hrRes);
-      setBkTeachers(bkRes);
-      setDispensationTypes(typeRes);
+      setDispensations(dispRes || []);
+      setStudents(studRes || []);
+      setHomeroomTeachers(hrRes || []);
+      setBkTeachers(bkRes || []);
+      setDispensationTypes(typeRes || []);
     } catch (error) {
       console.error('Failed to fetch data', error);
     } finally {
@@ -65,9 +65,9 @@ export default function Transaksi() {
     e.preventDefault();
     try {
       if (editingId) {
-        await api.put(`/dispensations/${editingId}`, formData);
+        await api.updateDispensation(editingId.toString(), formData);
       } else {
-        await api.post('/dispensations', formData);
+        await api.addDispensation(formData);
       }
       setFormData({
         date: format(new Date(), 'yyyy-MM-dd'),
@@ -107,7 +107,7 @@ export default function Transaksi() {
   const handleDelete = async () => {
     if (!deleteId) return;
     try {
-      await api.delete(`/dispensations/${deleteId}`);
+      await api.deleteDispensation(deleteId.toString());
       setDeleteId(null);
       fetchData();
     } catch (error) {

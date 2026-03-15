@@ -1,12 +1,20 @@
-import { Link, Outlet, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Database, FileText, Settings, Menu, X } from 'lucide-react';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { LayoutDashboard, Database, FileText, Settings, Menu, X, LogOut, User as UserIcon } from 'lucide-react';
 import { useState } from 'react';
 import SettingsModal from './SettingsModal';
+import { useAuth } from './AuthContext';
 
 export default function Layout() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, profile, logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/dashboard');
+  };
 
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -58,13 +66,41 @@ export default function Layout() {
             </nav>
           </div>
           <div className="flex-shrink-0 flex flex-col border-t border-slate-100 p-2 space-y-1 bg-slate-50/50">
-            <button
-              onClick={() => setIsSettingsOpen(true)}
-              className="flex items-center w-full px-2 sm:px-3 py-1.5 sm:py-2 text-[11px] sm:text-xs font-semibold text-slate-600 rounded-lg hover:bg-white hover:text-indigo-600 hover:shadow-sm transition-all duration-200"
-            >
-              <Settings className="mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-slate-400 group-hover:text-indigo-500" />
-              Pengaturan
-            </button>
+            {user ? (
+              <>
+                <div className="px-3 py-2 flex items-center gap-2 mb-1">
+                  <div className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center">
+                    <UserIcon className="h-3.5 w-3.5 text-indigo-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] font-bold text-slate-900 truncate">{profile?.username || user.displayName}</p>
+                    <p className="text-[9px] text-slate-500 truncate capitalize">{profile?.role}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setIsSettingsOpen(true)}
+                  className="flex items-center w-full px-2 sm:px-3 py-1.5 sm:py-2 text-[11px] sm:text-xs font-semibold text-slate-600 rounded-lg hover:bg-white hover:text-indigo-600 hover:shadow-sm transition-all duration-200"
+                >
+                  <Settings className="mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-slate-400 group-hover:text-indigo-500" />
+                  Pengaturan
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center w-full px-2 sm:px-3 py-1.5 sm:py-2 text-[11px] sm:text-xs font-semibold text-red-600 rounded-lg hover:bg-red-50 hover:text-red-700 transition-all duration-200"
+                >
+                  <LogOut className="mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-red-400" />
+                  Keluar
+                </button>
+              </>
+            ) : (
+              <Link
+                to="/login"
+                className="flex items-center w-full px-2 sm:px-3 py-1.5 sm:py-2 text-[11px] sm:text-xs font-semibold text-indigo-600 rounded-lg hover:bg-indigo-50 transition-all duration-200"
+              >
+                <LogOut className="mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-indigo-400" />
+                Masuk
+              </Link>
+            )}
           </div>
         </div>
       </div>
@@ -149,16 +185,45 @@ export default function Layout() {
               </nav>
             </div>
             <div className="flex-shrink-0 flex flex-col border-t border-slate-100 p-2 space-y-1 bg-slate-50">
-              <button
-                onClick={() => {
-                  setIsSettingsOpen(true);
-                  setIsMobileMenuOpen(false);
-                }}
-                className="flex items-center w-full px-2 py-1.5 text-[11px] sm:text-xs font-semibold text-slate-600 rounded-lg hover:bg-white hover:text-indigo-600 hover:shadow-sm transition-all duration-200"
-              >
-                <Settings className="mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-slate-400" />
-                Pengaturan
-              </button>
+              {user ? (
+                <>
+                  <div className="px-3 py-2 flex items-center gap-2 mb-1">
+                    <div className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center">
+                      <UserIcon className="h-3.5 w-3.5 text-indigo-600" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[10px] font-bold text-slate-900 truncate">{profile?.username || user.displayName}</p>
+                      <p className="text-[9px] text-slate-500 truncate capitalize">{profile?.role}</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setIsSettingsOpen(true);
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="flex items-center w-full px-2 py-1.5 text-[11px] sm:text-xs font-semibold text-slate-600 rounded-lg hover:bg-white hover:text-indigo-600 hover:shadow-sm transition-all duration-200"
+                  >
+                    <Settings className="mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-slate-400" />
+                    Pengaturan
+                  </button>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center w-full px-2 py-1.5 text-[11px] sm:text-xs font-semibold text-red-600 rounded-lg hover:bg-red-50 hover:text-red-700 transition-all duration-200"
+                  >
+                    <LogOut className="mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-red-400" />
+                    Keluar
+                  </button>
+                </>
+              ) : (
+                <Link
+                  to="/login"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center w-full px-2 py-1.5 text-[11px] sm:text-xs font-semibold text-indigo-600 rounded-lg hover:bg-indigo-50 transition-all duration-200"
+                >
+                  <LogOut className="mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-indigo-400" />
+                  Masuk
+                </Link>
+              )}
             </div>
           </div>
         </div>

@@ -2,34 +2,6 @@ import React from 'react';
 import { X, Database, Download, Upload, ShieldCheck, AlertCircle } from 'lucide-react';
 
 export default function SettingsModal({ onClose }: { onClose: () => void }) {
-  const handleBackup = () => {
-    window.open('/api/backup', '_blank');
-  };
-
-  const handleRestore = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const formData = new FormData();
-    formData.append('database', file);
-
-    try {
-      const res = await fetch('/api/restore', {
-        method: 'POST',
-        body: formData,
-      });
-      const data = await res.json();
-      if (data.success) {
-        alert('Database berhasil direstore. Halaman akan dimuat ulang.');
-        window.location.reload();
-      } else {
-        alert('Gagal merestore database: ' + data.message);
-      }
-    } catch (err) {
-      alert('Terjadi kesalahan saat merestore database');
-    }
-  };
-
   return (
     <div className="fixed z-50 inset-0 overflow-y-auto">
       <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:p-0">
@@ -58,29 +30,14 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
                   <h4 className="text-sm sm:text-base font-bold text-slate-800">Manajemen Database</h4>
                 </div>
                 
-                <div className="grid grid-cols-2 gap-2 sm:gap-3">
-                  <button
-                    onClick={handleBackup}
-                    className="flex flex-col items-center justify-center p-2 sm:p-3 rounded-lg border-2 border-slate-100 bg-slate-50 hover:bg-indigo-50 hover:border-indigo-200 transition-all group"
-                  >
-                    <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-white shadow-sm flex items-center justify-center mb-1 group-hover:scale-110 transition-transform">
-                      <Download className="h-3 w-3 sm:h-4 sm:w-4 text-indigo-600" />
-                    </div>
-                    <span className="text-[10px] sm:text-xs font-bold text-slate-700 group-hover:text-indigo-700">Backup Data</span>
-                  </button>
-                  
-                  <label className="flex flex-col items-center justify-center p-2 sm:p-3 rounded-lg border-2 border-slate-100 bg-slate-50 hover:bg-emerald-50 hover:border-emerald-200 transition-all group cursor-pointer">
-                    <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-white shadow-sm flex items-center justify-center mb-1 group-hover:scale-110 transition-transform">
-                      <Upload className="h-3 w-3 sm:h-4 sm:w-4 text-emerald-600" />
-                    </div>
-                    <span className="text-[10px] sm:text-xs font-bold text-slate-700 group-hover:text-emerald-700">Restore Data</span>
-                    <input type="file" className="hidden" accept=".json,application/json,.sqlite,*/*" onChange={handleRestore} />
-                  </label>
+                <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 text-center">
+                  <p className="text-xs text-slate-600 font-medium">
+                    Database sekarang dikelola secara otomatis oleh Firebase Firestore.
+                  </p>
+                  <p className="mt-2 text-[10px] text-slate-500">
+                    Data Anda tersimpan dengan aman di cloud dan sinkron secara real-time.
+                  </p>
                 </div>
-                <p className="mt-2 text-[9px] sm:text-[10px] text-slate-500 text-center bg-slate-50 p-1.5 rounded-md">
-                  <AlertCircle className="h-3 w-3 inline mr-1 text-slate-400" />
-                  Restore akan menimpa seluruh data saat ini.
-                </p>
               </div>
             </div>
           </div>

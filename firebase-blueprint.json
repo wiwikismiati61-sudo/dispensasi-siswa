@@ -1,0 +1,84 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile information",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth UID" },
+        "username": { "type": "string" },
+        "role": { "type": "string", "enum": ["admin", "user"] }
+      },
+      "required": ["uid", "username", "role"]
+    },
+    "Student": {
+      "title": "Student",
+      "description": "Student data",
+      "type": "object",
+      "properties": {
+        "nis": { "type": "string" },
+        "name": { "type": "string" },
+        "class_name": { "type": "string" }
+      },
+      "required": ["nis", "name", "class_name"]
+    },
+    "Teacher": {
+      "title": "Teacher",
+      "description": "Teacher data (Homeroom or BK)",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "type": { "type": "string", "enum": ["homeroom", "bk"] }
+      },
+      "required": ["name", "type"]
+    },
+    "DispensationType": {
+      "title": "Dispensation Type",
+      "description": "Types of dispensation",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "category": { "type": "string" }
+      },
+      "required": ["name", "category"]
+    },
+    "Dispensation": {
+      "title": "Dispensation",
+      "description": "Dispensation transaction record",
+      "type": "object",
+      "properties": {
+        "date": { "type": "string", "format": "date" },
+        "time": { "type": "string" },
+        "student_id": { "type": "string" },
+        "type": { "type": "string" },
+        "reason": { "type": "string" },
+        "homeroom_teacher": { "type": "string" },
+        "bk_teacher": { "type": "string" },
+        "follow_up": { "type": "string" }
+      },
+      "required": ["date", "time", "student_id", "type", "reason"]
+    }
+  },
+  "firestore": {
+    "/users/{uid}": {
+      "schema": "User",
+      "description": "User profiles"
+    },
+    "/students/{studentId}": {
+      "schema": "Student",
+      "description": "Student records"
+    },
+    "/teachers/{teacherId}": {
+      "schema": "Teacher",
+      "description": "Teacher records"
+    },
+    "/dispensation_types/{typeId}": {
+      "schema": "DispensationType",
+      "description": "Dispensation types"
+    },
+    "/dispensations/{dispensationId}": {
+      "schema": "Dispensation",
+      "description": "Dispensation records"
+    }
+  }
+}

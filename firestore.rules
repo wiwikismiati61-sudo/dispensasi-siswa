@@ -1,0 +1,140 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users
+    // Document ID: {uid}
+    // Fields:
+    //   - uid: string (required) - Firebase Auth UID
+    //   - username: string (required) - Display name
+    //   - role: string (required) - 'admin' or 'user'
+    //
+    // Collection: students
+    // Document ID: auto-generated
+    // Fields:
+    //   - nis: string (required)
+    //   - name: string (required)
+    //   - class_name: string (required)
+    //
+    // Collection: teachers
+    // Document ID: auto-generated
+    // Fields:
+    //   - name: string (required)
+    //   - type: string (required) - 'homeroom' or 'bk'
+    //
+    // Collection: dispensation_types
+    // Document ID: auto-generated
+    // Fields:
+    //   - name: string (required)
+    //   - category: string (required)
+    //
+    // Collection: dispensations
+    // Document ID: auto-generated
+    // Fields:
+    //   - date: string (required) - YYYY-MM-DD
+    //   - time: string (required) - HH:mm
+    //   - student_id: string (required) - Reference to students collection
+    //   - type: string (required)
+    //   - reason: string (required)
+    //   - homeroom_teacher: string
+    //   - bk_teacher: string
+    //   - follow_up: string
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin' ||
+         (request.auth.token.email == "wiwikismiati61@guru.smp.belajar.id" && request.auth.token.email_verified == true));
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+    function isValidUser(data) {
+      return data.uid is string && data.uid.size() > 0 &&
+             data.username is string && data.username.size() > 0 && data.username.size() < 100 &&
+             data.role in ['admin', 'user'];
+    }
+
+    function isValidStudent(data) {
+      return data.nis is string && data.nis.size() > 0 &&
+             data.name is string && data.name.size() > 0 && data.name.size() < 200 &&
+             data.class_name is string && data.class_name.size() > 0;
+    }
+
+    function isValidTeacher(data) {
+      return data.name is string && data.name.size() > 0 && data.name.size() < 200 &&
+             data.type in ['homeroom', 'bk'];
+    }
+
+    function isValidDispensationType(data) {
+      return data.name is string && data.name.size() > 0 &&
+             data.category is string && data.category.size() > 0;
+    }
+
+    function isValidDispensation(data) {
+      return data.date is string && data.date.matches("^\\d{4}-\\d{2}-\\d{2}$") &&
+             data.time is string &&
+             data.student_id is string &&
+             data.type is string &&
+             data.reason is string && data.reason.size() < 1000;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{uid} {
+      allow read: if isAuthenticated();
+      allow create: if isOwner(uid) && isValidUser(request.resource.data) && (request.resource.data.role == 'user' || isAdmin());
+      allow update: if isOwner(uid) && isValidUser(request.resource.data) && (request.resource.data.role == resource.data.role || isAdmin());
+    }
+
+    match /students/{studentId} {
+      allow read: if true;
+      allow create, update: if isAuthenticated() && isValidStudent(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /teachers/{teacherId} {
+      allow read: if true;
+      allow create, update: if isAuthenticated() && isValidTeacher(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /dispensation_types/{typeId} {
+      allow read: if true;
+      allow create, update: if isAuthenticated() && isValidDispensationType(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /dispensations/{dispensationId} {
+      allow read: if true;
+      allow create, update: if isAuthenticated() && isValidDispensation(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    match /test/connection {
+      allow read: if true;
+    }
+  }
+}

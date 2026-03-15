@@ -26,13 +26,12 @@ export default function MasterData() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      let endpoint = '';
-      if (activeTab === 'siswa') endpoint = '/students';
-      if (activeTab === 'wali_kelas') endpoint = '/homeroom-teachers';
-      if (activeTab === 'guru_bk') endpoint = '/bk-teachers';
-      if (activeTab === 'jenis_dispensasi') endpoint = '/dispensation-types';
+      let res: any[] = [];
+      if (activeTab === 'siswa') res = await api.getStudents() || [];
+      if (activeTab === 'wali_kelas') res = await api.getTeachers('homeroom') || [];
+      if (activeTab === 'guru_bk') res = await api.getTeachers('bk') || [];
+      if (activeTab === 'jenis_dispensasi') res = await api.getDispensationTypes() || [];
       
-      const res = await api.get(endpoint);
       setData(res);
     } catch (error) {
       console.error('Failed to fetch data', error);
@@ -55,7 +54,6 @@ export default function MasterData() {
         const excelData = XLSX.utils.sheet_to_json(ws);
         
         let formattedData: any[] = [];
-        let endpoint = '';
 
         if (activeTab === 'siswa') {
           formattedData = excelData.map((row: any, index: number) => {
@@ -72,10 +70,13 @@ export default function MasterData() {
               class_name: className
             };
           }).filter((s) => s.name);
-          endpoint = '/students/import';
+          
           if (formattedData.length === 0) {
             setErrorMessage('Format excel tidak sesuai. Pastikan ada kolom Nama dan Kelas.');
             return;
+          }
+          for (const student of formattedData) {
+            await api.addStudent(student);
           }
         } else if (activeTab === 'wali_kelas' || activeTab === 'guru_bk') {
           formattedData = excelData.map((row: any) => {
@@ -83,12 +84,18 @@ export default function MasterData() {
               const key = Object.keys(row).find(k => keys.includes(k.toLowerCase().trim()));
               return key && row[key] != null ? String(row[key]) : '';
             };
-            return { name: getVal(['nama', 'name', 'guru', 'wali kelas']) };
+            return { 
+              name: getVal(['nama', 'name', 'guru', 'wali kelas']),
+              type: activeTab === 'wali_kelas' ? 'homeroom' : 'bk'
+            };
           }).filter((t) => t.name);
-          endpoint = activeTab === 'wali_kelas' ? '/homeroom-teachers/import' : '/bk-teachers/import';
+          
           if (formattedData.length === 0) {
             setErrorMessage('Format excel tidak sesuai. Pastikan ada kolom Nama.');
             return;
+          }
+          for (const teacher of formattedData) {
+            await api.addTeacher(teacher);
           }
         } else if (activeTab === 'jenis_dispensasi') {
           formattedData = excelData.map((row: any) => {
@@ -101,23 +108,16 @@ export default function MasterData() {
               category: getVal(['kategori', 'category', 'kelompok'])
             };
           }).filter((d) => d.name && d.category);
-          endpoint = '/dispensation-types/import';
+          
           if (formattedData.length === 0) {
             setErrorMessage('Format excel tidak sesuai. Pastikan ada kolom Nama dan Kategori.');
             return;
           }
+          for (const type of formattedData) {
+            await api.addDispensationType(type);
+          }
         }
 
-        let payload: any = {};
-        if (activeTab === 'siswa') {
-          payload = { students: formattedData };
-        } else if (activeTab === 'wali_kelas' || activeTab === 'guru_bk') {
-          payload = { teachers: formattedData };
-        } else if (activeTab === 'jenis_dispensasi') {
-          payload = { types: formattedData };
-        }
-
-        await api.post(endpoint, payload);
         setSuccessMessage('Data berhasil diimport');
         fetchData();
       } catch (error) {
@@ -133,25 +133,16 @@ export default function MasterData() {
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      let endpoint = '';
-      let payload = {};
-
       if (activeTab === 'siswa') {
-        endpoint = '/students';
-        payload = { ...studentForm, nis: Date.now().toString() + Math.floor(Math.random() * 1000) };
+        await api.addStudent({ ...studentForm, nis: Date.now().toString() + Math.floor(Math.random() * 1000) });
       } else if (activeTab === 'wali_kelas') {
-        endpoint = '/homeroom-teachers';
-        payload = teacherForm;
+        await api.addTeacher({ ...teacherForm, type: 'homeroom' });
       } else if (activeTab === 'guru_bk') {
-        endpoint = '/bk-teachers';
-        payload = teacherForm;
+        await api.addTeacher({ ...teacherForm, type: 'bk' });
       } else if (activeTab === 'jenis_dispensasi') {
-        endpoint = '/dispensation-types';
-        payload = dispensationForm;
+        await api.addDispensationType(dispensationForm);
       }
 
-      await api.post(endpoint, payload);
-      
       setStudentForm({ name: '', class_name: '' });
       setTeacherForm({ name: '' });
       setDispensationForm({ name: '', category: '' });
@@ -165,13 +156,11 @@ export default function MasterData() {
   const handleDelete = async () => {
     if (!deleteId) return;
     try {
-      let endpoint = '';
-      if (activeTab === 'siswa') endpoint = `/students/${deleteId}`;
-      if (activeTab === 'wali_kelas') endpoint = `/homeroom-teachers/${deleteId}`;
-      if (activeTab === 'guru_bk') endpoint = `/bk-teachers/${deleteId}`;
-      if (activeTab === 'jenis_dispensasi') endpoint = `/dispensation-types/${deleteId}`;
+      const idStr = deleteId.toString();
+      if (activeTab === 'siswa') await api.deleteStudent(idStr);
+      if (activeTab === 'wali_kelas' || activeTab === 'guru_bk') await api.deleteTeacher(idStr);
+      if (activeTab === 'jenis_dispensasi') await api.deleteDispensationType(idStr);
       
-      await api.delete(endpoint);
       setDeleteId(null);
       fetchData();
     } catch (error) {
