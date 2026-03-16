@@ -27,11 +27,7 @@ export default function App() {
                 <Transaksi />
               </ProtectedRoute>
             } />
-            <Route path="laporan" element={
-              <ProtectedRoute>
-                <Laporan />
-              </ProtectedRoute>
-            } />
+            <Route path="laporan" element={<Laporan />} />
           </Route>
         </Routes>
       </BrowserRouter>
