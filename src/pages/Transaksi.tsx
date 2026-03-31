@@ -8,7 +8,7 @@ export default function Transaksi() {
   const { user } = useAuth();
   const userRole = user?.role?.toLowerCase() || '';
   const isAdmin = userRole === 'full access' || userRole === 'admin' || userRole === 'administrator' || user?.username === 'admin';
-  const canEdit = isAdmin || userRole === 'input data dan edit';
+  const canEdit = isAdmin || userRole === 'input data dan edit' || userRole === 'kesiswaan' || user?.username?.toLowerCase() === 'kesiswaan';
   const canDelete = isAdmin;
   const [dispensations, setDispensations] = useState<any[]>([]);
   const [students, setStudents] = useState<any[]>([]);

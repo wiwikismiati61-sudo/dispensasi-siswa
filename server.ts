@@ -17,7 +17,7 @@ app.use(express.json({ limit: '50mb' }));
 app.post('/api/login', (req, res) => {
   const { username, password } = req.body;
   try {
-    const user = db.data.users.find((u: any) => u.username === username && u.password === password);
+    const user = db.data.users.find((u: any) => u.username.toLowerCase() === username.toLowerCase() && u.password === password);
     if (user) {
       res.json({ success: true, user: { id: user.id, username: user.username, name: user.name, role: user.role } });
     } else {
