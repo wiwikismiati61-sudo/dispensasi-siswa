@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../components/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { LogIn } from 'lucide-react';
@@ -10,7 +10,10 @@ export default function LoginPage() {
   const location = useLocation();
   const from = location.state?.from?.pathname || '/dashboard';
 
-  const [error, setError] = React.useState<string | null>(null);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -22,18 +25,30 @@ export default function LoginPage() {
     return null;
   }
 
-  const handleLogin = async () => {
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
     setError(null);
+    setLoading(true);
     try {
-      await login();
-      navigate(from, { replace: true });
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        login(data.user);
+        navigate(from, { replace: true });
+      } else {
+        setError(data.message || 'Username atau password salah');
+      }
     } catch (err: any) {
       console.error('Login failed:', err);
-      if (err.code === 'auth/unauthorized-domain') {
-        setError('Domain ini belum diizinkan di Firebase Console. Silakan tambahkan domain Vercel Anda ke "Authorized Domains" di Firebase Authentication.');
-      } else {
-        setError('Gagal masuk: ' + (err.message || 'Terjadi kesalahan yang tidak diketahui'));
-      }
+      setError('Terjadi kesalahan saat menghubungi server');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -58,13 +73,37 @@ export default function LoginPage() {
           </div>
         )}
 
-        <button
-          onClick={handleLogin}
-          className="w-full flex justify-center items-center gap-3 py-3 px-4 border border-transparent rounded-xl shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all font-semibold"
-        >
-          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5 bg-white rounded-full p-0.5" referrerPolicy="no-referrer" />
-          Masuk dengan Google
-        </button>
+        <form onSubmit={handleLogin} className="space-y-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Username</label>
+            <input
+              type="text"
+              required
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              placeholder="Masukkan username"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Password</label>
+            <input
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              placeholder="Masukkan password"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full flex justify-center items-center gap-3 py-3 px-4 border border-transparent rounded-xl shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all font-semibold disabled:opacity-50"
+          >
+            {loading ? 'Memproses...' : 'Masuk'}
+          </button>
+        </form>
 
         <div className="text-center text-sm text-gray-500">
           <p>Aplikasi Dispensasi Siswa</p>

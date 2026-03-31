@@ -2,8 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { api } from '../lib/api';
 import { format } from 'date-fns';
 import { Plus, Trash2, Edit2, AlertCircle, Calendar, Clock, User, FileText, CheckCircle2 } from 'lucide-react';
+import { useAuth } from '../components/AuthContext';
 
 export default function Transaksi() {
+  const { user } = useAuth();
+  const userRole = user?.role?.toLowerCase() || '';
+  const isAdmin = userRole === 'full access' || userRole === 'admin' || userRole === 'administrator' || user?.username === 'admin';
+  const canEdit = isAdmin || userRole === 'input data dan edit';
+  const canDelete = isAdmin;
   const [dispensations, setDispensations] = useState<any[]>([]);
   const [students, setStudents] = useState<any[]>([]);
   const [homeroomTeachers, setHomeroomTeachers] = useState<any[]>([]);
@@ -120,42 +126,44 @@ export default function Transaksi() {
     <div className="flex flex-col h-full space-y-4 sm:space-y-6 pb-6">
       <div className="flex justify-between items-center flex-shrink-0">
         <h1 className="text-lg sm:text-xl md:text-2xl font-extrabold text-slate-800 tracking-tight">Transaksi Dispensasi</h1>
-        <button
-          onClick={() => {
-            if (showAddForm) {
-              setShowAddForm(false);
-              setEditingId(null);
-              setFormData({
-                date: format(new Date(), 'yyyy-MM-dd'),
-                time: format(new Date(), 'HH:mm'),
-                student_id: '',
-                type: '',
-                reason: '',
-                homeroom_teacher: '',
-                bk_teacher: '',
-                follow_up: ''
-              });
-              setSelectedClass('');
-            } else {
-              setShowAddForm(true);
-            }
-          }}
-          className={`inline-flex items-center px-2.5 py-1.5 sm:px-3 sm:py-2 border border-transparent shadow-md text-xs font-bold rounded-lg text-white transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] ${
-            showAddForm 
-              ? 'bg-slate-500 hover:bg-slate-600' 
-              : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700'
-          }`}
-        >
-          {showAddForm ? (
-            'Batal'
-          ) : (
-            <>
-              <Plus className="-ml-1 mr-1.5 h-4 w-4" />
-              <span className="hidden sm:inline">Tambah Dispensasi</span>
-              <span className="sm:hidden">Tambah</span>
-            </>
-          )}
-        </button>
+        {canEdit && (
+          <button
+            onClick={() => {
+              if (showAddForm) {
+                setShowAddForm(false);
+                setEditingId(null);
+                setFormData({
+                  date: format(new Date(), 'yyyy-MM-dd'),
+                  time: format(new Date(), 'HH:mm'),
+                  student_id: '',
+                  type: '',
+                  reason: '',
+                  homeroom_teacher: '',
+                  bk_teacher: '',
+                  follow_up: ''
+                });
+                setSelectedClass('');
+              } else {
+                setShowAddForm(true);
+              }
+            }}
+            className={`inline-flex items-center px-2.5 py-1.5 sm:px-3 sm:py-2 border border-transparent shadow-md text-xs font-bold rounded-lg text-white transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] ${
+              showAddForm 
+                ? 'bg-slate-500 hover:bg-slate-600' 
+                : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700'
+            }`}
+          >
+            {showAddForm ? (
+              'Batal'
+            ) : (
+              <>
+                <Plus className="-ml-1 mr-1.5 h-4 w-4" />
+                <span className="hidden sm:inline">Tambah Dispensasi</span>
+                <span className="sm:hidden">Tambah</span>
+              </>
+            )}
+          </button>
+        )}
       </div>
 
       {showAddForm && (
@@ -351,7 +359,9 @@ export default function Transaksi() {
                 <th className="px-3 sm:px-4 py-2 sm:py-2.5 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Jenis</th>
                 <th className="px-3 sm:px-4 py-2 sm:py-2.5 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Alasan</th>
                 <th className="px-3 sm:px-4 py-2 sm:py-2.5 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Tindak Lanjut</th>
-                <th className="px-3 sm:px-4 py-2 sm:py-2.5 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Aksi</th>
+                {(canEdit || canDelete) && (
+                  <th className="px-3 sm:px-4 py-2 sm:py-2.5 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Aksi</th>
+                )}
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-slate-100">
@@ -399,22 +409,28 @@ export default function Transaksi() {
                     </td>
                     <td className="px-3 sm:px-4 py-2 sm:py-2.5 text-[11px] sm:text-xs text-slate-600 max-w-[100px] sm:max-w-[150px] truncate" title={item.reason}>{item.reason}</td>
                     <td className="px-3 sm:px-4 py-2 sm:py-2.5 text-[11px] sm:text-xs text-slate-600 max-w-[100px] sm:max-w-[150px] truncate" title={item.follow_up}>{item.follow_up || '-'}</td>
-                    <td className="px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap text-right text-[11px] sm:text-xs font-medium">
-                      <button
-                        onClick={() => handleEdit(item)}
-                        className="text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 p-1.5 rounded-md transition-colors mr-1"
-                        title="Edit"
-                      >
-                        <Edit2 className="h-3.5 w-3.5" />
-                      </button>
-                      <button
-                        onClick={() => setDeleteId(item.id)}
-                        className="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-1.5 rounded-md transition-colors"
-                        title="Hapus"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
-                    </td>
+                    {(canEdit || canDelete) && (
+                      <td className="px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap text-right text-[11px] sm:text-xs font-medium">
+                        {canEdit && (
+                          <button
+                            onClick={() => handleEdit(item)}
+                            className="text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 p-1.5 rounded-md transition-colors mr-1"
+                            title="Edit"
+                          >
+                            <Edit2 className="h-3.5 w-3.5" />
+                          </button>
+                        )}
+                        {canDelete && (
+                          <button
+                            onClick={() => setDeleteId(item.id)}
+                            className="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-1.5 rounded-md transition-colors"
+                            title="Hapus"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        )}
+                      </td>
+                    )}
                   </tr>
                 ))
               )}

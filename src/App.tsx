@@ -5,6 +5,7 @@ import MasterData from './pages/MasterData';
 import Transaksi from './pages/Transaksi';
 import Laporan from './pages/Laporan';
 import LoginPage from './pages/LoginPage';
+import UserManagement from './pages/UserManagement';
 import { AuthProvider } from './components/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -28,6 +29,11 @@ export default function App() {
               </ProtectedRoute>
             } />
             <Route path="laporan" element={<Laporan />} />
+            <Route path="users" element={
+              <ProtectedRoute>
+                <UserManagement />
+              </ProtectedRoute>
+            } />
           </Route>
         </Routes>
       </BrowserRouter>

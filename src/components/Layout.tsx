@@ -7,7 +7,7 @@ import { useAuth } from './AuthContext';
 export default function Layout() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, profile, logout } = useAuth();
+  const { user, logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
@@ -22,6 +22,13 @@ export default function Layout() {
     { name: 'Transaksi', href: '/transaksi', icon: FileText },
     { name: 'Laporan', href: '/laporan', icon: FileText },
   ];
+
+  const userRole = user?.role?.toLowerCase() || '';
+  const isAdmin = userRole === 'full access' || userRole === 'admin' || userRole === 'administrator' || user?.username === 'admin';
+
+  if (isAdmin) {
+    navigation.push({ name: 'Manajemen User', href: '/users', icon: UserIcon });
+  }
 
   return (
     <div className="h-screen bg-slate-50 flex overflow-hidden font-sans">
@@ -73,8 +80,8 @@ export default function Layout() {
                     <UserIcon className="h-3.5 w-3.5 text-indigo-600" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[10px] font-bold text-slate-900 truncate">{profile?.username || user.displayName}</p>
-                    <p className="text-[9px] text-slate-500 truncate capitalize">{profile?.role}</p>
+                    <p className="text-[10px] font-bold text-slate-900 truncate">{user.name || user.username}</p>
+                    <p className="text-[9px] text-slate-500 truncate capitalize">{user.role}</p>
                   </div>
                 </div>
                 <button
@@ -192,8 +199,8 @@ export default function Layout() {
                       <UserIcon className="h-3.5 w-3.5 text-indigo-600" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-[10px] font-bold text-slate-900 truncate">{profile?.username || user.displayName}</p>
-                      <p className="text-[9px] text-slate-500 truncate capitalize">{profile?.role}</p>
+                      <p className="text-[10px] font-bold text-slate-900 truncate">{user.name || user.username}</p>
+                      <p className="text-[9px] text-slate-500 truncate capitalize">{user.role}</p>
                     </div>
                   </div>
                   <button

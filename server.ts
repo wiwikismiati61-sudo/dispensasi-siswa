@@ -19,10 +19,80 @@ app.post('/api/login', (req, res) => {
   try {
     const user = db.data.users.find((u: any) => u.username === username && u.password === password);
     if (user) {
-      res.json({ success: true, user: { id: user.id, username: user.username } });
+      res.json({ success: true, user: { id: user.id, username: user.username, name: user.name, role: user.role } });
     } else {
       res.status(401).json({ success: false, message: 'Username atau password salah' });
     }
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// Users Management
+app.get('/api/users', (req, res) => {
+  try {
+    // Don't send passwords to the client
+    const users = db.data.users.map((u: any) => ({
+      id: u.id,
+      username: u.username,
+      name: u.name,
+      role: u.role
+    }));
+    res.json(users);
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+app.post('/api/users', (req, res) => {
+  const { username, password, name, role } = req.body;
+  try {
+    if (db.data.users.some((u: any) => u.username === username)) {
+      return res.status(400).json({ success: false, message: 'Username already exists' });
+    }
+    const id = db.data.users.length > 0 ? Math.max(...db.data.users.map((u: any) => u.id)) + 1 : 1;
+    db.data.users.push({ id, username, password, name, role });
+    db.save();
+    res.json({ success: true, id });
+  } catch (error: any) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+});
+
+app.put('/api/users/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  const { username, password, name, role } = req.body;
+  try {
+    const index = db.data.users.findIndex((u: any) => u.id === id);
+    if (index !== -1) {
+      // If password is not provided, keep the old one
+      const updatedUser = {
+        id,
+        username,
+        name,
+        role,
+        password: password ? password : db.data.users[index].password
+      };
+      db.data.users[index] = updatedUser;
+      db.save();
+      res.json({ success: true });
+    } else {
+      res.status(404).json({ success: false, message: 'User not found' });
+    }
+  } catch (error: any) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+});
+
+app.delete('/api/users/:id', (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    if (id === 1) {
+      return res.status(400).json({ success: false, message: 'Cannot delete default admin' });
+    }
+    db.data.users = db.data.users.filter((u: any) => u.id !== id);
+    db.save();
+    res.json({ success: true });
   } catch (error: any) {
     res.status(500).json({ success: false, message: error.message });
   }

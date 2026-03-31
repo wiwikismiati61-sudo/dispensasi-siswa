@@ -40,7 +40,7 @@ class JSONDatabase {
 
   private initEmpty() {
     this.data = {
-      users: [{ id: 1, username: 'admin', password: 'admin123' }],
+      users: [{ id: 1, username: 'admin', password: 'admin123', name: 'Administrator', role: 'Full Access' }],
       students: [],
       dispensations: [],
       homeroom_teachers: [],
