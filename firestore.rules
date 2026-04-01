@@ -116,25 +116,25 @@ service cloud.firestore {
     match /students/{studentId} {
       allow read: if true;
       allow create, update: if isAuthenticated() && isValidStudent(request.resource.data);
-      allow delete: if isAdmin();
+      allow delete: if isAuthenticated();
     }
 
     match /teachers/{teacherId} {
       allow read: if true;
       allow create, update: if isAuthenticated() && isValidTeacher(request.resource.data);
-      allow delete: if isAdmin();
+      allow delete: if isAuthenticated();
     }
 
     match /dispensation_types/{typeId} {
       allow read: if true;
       allow create, update: if isAuthenticated() && isValidDispensationType(request.resource.data);
-      allow delete: if isAdmin();
+      allow delete: if isAuthenticated();
     }
 
     match /dispensations/{dispensationId} {
       allow read: if true;
       allow create, update: if isAuthenticated() && isValidDispensation(request.resource.data);
-      allow delete: if isAdmin();
+      allow delete: if isAuthenticated();
     }
 
     match /test/connection {
