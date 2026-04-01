@@ -24,7 +24,8 @@ export default function Layout() {
   ];
 
   const userRole = user?.role?.toLowerCase() || '';
-  const isAdmin = userRole === 'full access' || userRole === 'admin' || userRole === 'administrator' || user?.username === 'admin';
+  const username = user?.username?.toLowerCase() || '';
+  const isAdmin = userRole === 'full access' || userRole === 'admin' || userRole === 'administrator' || username === 'admin' || username === 'administrator';
 
   if (isAdmin) {
     navigation.push({ name: 'Manajemen User', href: '/users', icon: UserIcon });

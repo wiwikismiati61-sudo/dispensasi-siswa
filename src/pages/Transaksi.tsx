@@ -7,8 +7,9 @@ import { useAuth } from '../components/AuthContext';
 export default function Transaksi() {
   const { user } = useAuth();
   const userRole = user?.role?.toLowerCase() || '';
-  const isAdmin = userRole === 'full access' || userRole === 'admin' || userRole === 'administrator' || user?.username === 'admin';
-  const canEdit = isAdmin || userRole === 'input data dan edit' || userRole === 'kesiswaan' || user?.username?.toLowerCase() === 'kesiswaan';
+  const username = user?.username?.toLowerCase() || '';
+  const isAdmin = userRole === 'full access' || userRole === 'admin' || userRole === 'administrator' || username === 'admin' || username === 'administrator';
+  const canEdit = isAdmin || userRole === 'input data dan edit' || userRole === 'kesiswaan' || username === 'kesiswaan';
   const canDelete = isAdmin;
   const [dispensations, setDispensations] = useState<any[]>([]);
   const [students, setStudents] = useState<any[]>([]);
@@ -29,8 +30,11 @@ export default function Transaksi() {
     reason: '',
     homeroom_teacher: '',
     bk_teacher: '',
-    follow_up: ''
+    follow_up: '',
+    proof_url: ''
   });
+  const [proofFile, setProofFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -69,11 +73,19 @@ export default function Transaksi() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setUploading(true);
     try {
+      let finalProofUrl = formData.proof_url;
+      if (proofFile) {
+        finalProofUrl = await api.uploadProof(proofFile);
+      }
+      
+      const payload = { ...formData, proof_url: finalProofUrl };
+
       if (editingId) {
-        await api.updateDispensation(editingId.toString(), formData);
+        await api.updateDispensation(editingId.toString(), payload);
       } else {
-        await api.addDispensation(formData);
+        await api.addDispensation(payload);
       }
       setFormData({
         date: format(new Date(), 'yyyy-MM-dd'),
@@ -83,14 +95,18 @@ export default function Transaksi() {
         reason: '',
         homeroom_teacher: '',
         bk_teacher: '',
-        follow_up: ''
+        follow_up: '',
+        proof_url: ''
       });
+      setProofFile(null);
       setSelectedClass('');
       setShowAddForm(false);
       setEditingId(null);
       fetchData();
     } catch (error: any) {
       setErrorMessage(`Gagal ${editingId ? 'mengubah' : 'menambah'} data: ` + error.message);
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -103,8 +119,10 @@ export default function Transaksi() {
       reason: item.reason,
       homeroom_teacher: item.homeroom_teacher,
       bk_teacher: item.bk_teacher,
-      follow_up: item.follow_up || ''
+      follow_up: item.follow_up || '',
+      proof_url: item.proof_url || ''
     });
+    setProofFile(null);
     setSelectedClass(item.class_name);
     setEditingId(item.id);
     setShowAddForm(true);
@@ -132,6 +150,7 @@ export default function Transaksi() {
               if (showAddForm) {
                 setShowAddForm(false);
                 setEditingId(null);
+                setProofFile(null);
                 setFormData({
                   date: format(new Date(), 'yyyy-MM-dd'),
                   time: format(new Date(), 'HH:mm'),
@@ -140,7 +159,8 @@ export default function Transaksi() {
                   reason: '',
                   homeroom_teacher: '',
                   bk_teacher: '',
-                  follow_up: ''
+                  follow_up: '',
+                  proof_url: ''
                 });
                 setSelectedClass('');
               } else {
@@ -316,12 +336,31 @@ export default function Transaksi() {
                 placeholder="Catatan tindak lanjut (opsional)"
               />
             </div>
+            <div className="col-span-2">
+              <label className="block text-[10px] sm:text-xs font-semibold text-slate-700 mb-1">Bukti Terlampir (Opsional)</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  if (e.target.files && e.target.files[0]) {
+                    setProofFile(e.target.files[0]);
+                  }
+                }}
+                className="block w-full text-[10px] sm:text-xs text-slate-500 file:mr-4 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-[10px] file:sm:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 transition-all"
+              />
+              {formData.proof_url && !proofFile && (
+                <a href={formData.proof_url} target="_blank" rel="noopener noreferrer" className="text-xs text-indigo-600 hover:text-indigo-800 mt-1 inline-block">
+                  Lihat Bukti Saat Ini
+                </a>
+              )}
+            </div>
             <div className="col-span-2 flex justify-end pt-2 mt-1 border-t border-slate-100">
               <button
                 type="button"
                 onClick={() => {
                   setShowAddForm(false);
                   setEditingId(null);
+                  setProofFile(null);
                   setFormData({
                     date: format(new Date(), 'yyyy-MM-dd'),
                     time: format(new Date(), 'HH:mm'),
@@ -330,7 +369,8 @@ export default function Transaksi() {
                     reason: '',
                     homeroom_teacher: '',
                     bk_teacher: '',
-                    follow_up: ''
+                    follow_up: '',
+                    proof_url: ''
                   });
                   setSelectedClass('');
                 }}
@@ -340,9 +380,10 @@ export default function Transaksi() {
               </button>
               <button
                 type="submit"
-                className="bg-gradient-to-r from-indigo-600 to-purple-600 border border-transparent rounded-lg shadow-md py-1.5 sm:py-2 px-3 sm:px-4 inline-flex justify-center text-[11px] sm:text-xs font-bold text-white hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                disabled={uploading}
+                className="bg-gradient-to-r from-indigo-600 to-purple-600 border border-transparent rounded-lg shadow-md py-1.5 sm:py-2 px-3 sm:px-4 inline-flex justify-center text-[11px] sm:text-xs font-bold text-white hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {editingId ? 'Simpan Perubahan' : 'Simpan Data'}
+                {uploading ? 'Menyimpan...' : (editingId ? 'Simpan Perubahan' : 'Simpan Data')}
               </button>
             </div>
           </form>
@@ -359,6 +400,7 @@ export default function Transaksi() {
                 <th className="px-3 sm:px-4 py-2 sm:py-2.5 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Jenis</th>
                 <th className="px-3 sm:px-4 py-2 sm:py-2.5 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Alasan</th>
                 <th className="px-3 sm:px-4 py-2 sm:py-2.5 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Tindak Lanjut</th>
+                <th className="px-3 sm:px-4 py-2 sm:py-2.5 text-left text-[10px] font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Bukti</th>
                 {(canEdit || canDelete) && (
                   <th className="px-3 sm:px-4 py-2 sm:py-2.5 text-right text-[10px] font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Aksi</th>
                 )}
@@ -367,7 +409,7 @@ export default function Transaksi() {
             <tbody className="bg-white divide-y divide-slate-100">
               {loading ? (
                 <tr>
-                  <td colSpan={6} className="px-3 sm:px-4 py-6 sm:py-8 text-center">
+                  <td colSpan={7} className="px-3 sm:px-4 py-6 sm:py-8 text-center">
                     <div className="flex flex-col items-center justify-center">
                       <div className="animate-spin rounded-full h-5 w-5 sm:h-6 sm:w-6 border-b-2 border-indigo-600 mb-2 sm:mb-3"></div>
                       <span className="text-[11px] sm:text-xs font-medium text-slate-500">Memuat data transaksi...</span>
@@ -376,7 +418,7 @@ export default function Transaksi() {
                 </tr>
               ) : dispensations.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-3 sm:px-4 py-6 sm:py-8 text-center">
+                  <td colSpan={7} className="px-3 sm:px-4 py-6 sm:py-8 text-center">
                     <div className="flex flex-col items-center justify-center text-slate-400">
                       <AlertCircle className="h-8 w-8 sm:h-10 sm:w-10 mb-2 text-slate-300" />
                       <span className="text-xs sm:text-sm font-medium text-slate-500">Belum ada data transaksi</span>
@@ -409,6 +451,15 @@ export default function Transaksi() {
                     </td>
                     <td className="px-3 sm:px-4 py-2 sm:py-2.5 text-[11px] sm:text-xs text-slate-600 max-w-[100px] sm:max-w-[150px] truncate" title={item.reason}>{item.reason}</td>
                     <td className="px-3 sm:px-4 py-2 sm:py-2.5 text-[11px] sm:text-xs text-slate-600 max-w-[100px] sm:max-w-[150px] truncate" title={item.follow_up}>{item.follow_up || '-'}</td>
+                    <td className="px-3 sm:px-4 py-2 sm:py-2.5 text-[11px] sm:text-xs text-slate-600">
+                      {item.proof_url ? (
+                        <a href={item.proof_url} target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:text-indigo-800 underline">
+                          Lihat
+                        </a>
+                      ) : (
+                        '-'
+                      )}
+                    </td>
                     {(canEdit || canDelete) && (
                       <td className="px-3 sm:px-4 py-2 sm:py-2.5 whitespace-nowrap text-right text-[11px] sm:text-xs font-medium">
                         {canEdit && (

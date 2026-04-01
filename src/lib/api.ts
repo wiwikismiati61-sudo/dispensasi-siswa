@@ -11,7 +11,8 @@ import {
   setDoc,
   getDocFromServer
 } from 'firebase/firestore';
-import { db, auth } from '../firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { db, auth, storage } from '../firebase';
 
 export enum OperationType {
   CREATE = 'create',
@@ -201,6 +202,17 @@ export const api = {
       await deleteDoc(doc(db, 'dispensations', id));
     } catch (error) {
       handleFirestoreError(error, OperationType.DELETE, `dispensations/${id}`);
+    }
+  },
+  async uploadProof(file: File) {
+    try {
+      const storageRef = ref(storage, `proofs/${Date.now()}_${file.name}`);
+      const snapshot = await uploadBytes(storageRef, file);
+      const downloadURL = await getDownloadURL(snapshot.ref);
+      return downloadURL;
+    } catch (error) {
+      console.error("Error uploading proof:", error);
+      throw error;
     }
   },
 

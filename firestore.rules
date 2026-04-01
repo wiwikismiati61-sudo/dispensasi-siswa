@@ -96,7 +96,11 @@ service cloud.firestore {
              data.time is string &&
              data.student_id is string &&
              data.type is string &&
-             data.reason is string && data.reason.size() < 1000;
+             data.reason is string && data.reason.size() < 1000 &&
+             (!('homeroom_teacher' in data) || data.homeroom_teacher is string) &&
+             (!('bk_teacher' in data) || data.bk_teacher is string) &&
+             (!('follow_up' in data) || data.follow_up is string) &&
+             (!('proof_url' in data) || data.proof_url is string);
     }
 
     // ===============================================================

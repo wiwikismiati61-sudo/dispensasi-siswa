@@ -39,7 +39,7 @@ export default function LoginPage() {
       const data = await response.json();
       
       if (data.success) {
-        login(data.user);
+        await login(data.user);
         navigate(from, { replace: true });
       } else {
         setError(data.message || 'Username atau password salah');

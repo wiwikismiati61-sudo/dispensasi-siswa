@@ -9,8 +9,9 @@ type TabType = 'siswa' | 'wali_kelas' | 'guru_bk' | 'jenis_dispensasi';
 export default function MasterData() {
   const { user } = useAuth();
   const userRole = user?.role?.toLowerCase() || '';
-  const isAdmin = userRole === 'full access' || userRole === 'admin' || userRole === 'administrator' || user?.username === 'admin';
-  const canEdit = isAdmin || userRole === 'input data dan edit' || userRole === 'kesiswaan' || user?.username?.toLowerCase() === 'kesiswaan';
+  const username = user?.username?.toLowerCase() || '';
+  const isAdmin = userRole === 'full access' || userRole === 'admin' || userRole === 'administrator' || username === 'admin' || username === 'administrator';
+  const canEdit = isAdmin || userRole === 'input data dan edit' || userRole === 'kesiswaan' || username === 'kesiswaan';
   const canDelete = isAdmin;
   const [activeTab, setActiveTab] = useState<TabType>('siswa');
   const [data, setData] = useState<any[]>([]);

@@ -11,7 +11,8 @@ export default function SettingsModal({ onClose }: { onClose: () => void }) {
   
   // Check for various admin roles just in case
   const userRole = user?.role?.toLowerCase() || '';
-  const isAdmin = userRole === 'full access' || userRole === 'admin' || userRole === 'administrator' || user?.username === 'admin';
+  const username = user?.username?.toLowerCase() || '';
+  const isAdmin = userRole === 'full access' || userRole === 'admin' || userRole === 'administrator' || username === 'admin' || username === 'administrator';
 
   const handleBackup = () => {
     window.open('/api/backup', '_blank');
